@@ -27,7 +27,39 @@ Proyecto de ejemplo **para un programador principiante**:
    npm start
    ```
 6. Endpoints:
-   - `POST /auth/register` { username, password }
-   - `POST /auth/login` { username, password }
-   - `POST /auth/logout`
-   - `GET /perfil` (protegido)
+    - `POST /auth/register` — Registro de estudiantes. Solo acepta correos que terminen en `@estudiante.edu` y asigna automáticamente el rol de estudiante. Ejemplo de body:
+       ```json
+       {
+          "full_name": "Nombre Estudiante",
+          "national_id": "12345678",
+          "email": "nombre@estudiante.edu",
+          "password": "tu_contraseña",
+          "institution_id": 1
+       }
+       ```
+    - `POST /auth/login` — Login de estudiantes. Solo permite correos `@estudiante.edu`.
+       ```json
+       {
+          "email": "nombre@estudiante.edu",
+          "password": "tu_contraseña"
+       }
+       ```
+    - `POST /auth/register-teacher` — Registro de maestros. Solo acepta correos que terminen en `@maestro.edu` y asigna automáticamente el rol de maestro. Ejemplo de body:
+       ```json
+       {
+          "full_name": "Nombre Maestro",
+          "national_id": "87654321",
+          "email": "nombre@maestro.edu",
+          "password": "tu_contraseña",
+          "institution_id": 1
+       }
+       ```
+    - `POST /auth/login-teacher` — Login de maestros. Solo permite correos `@maestro.edu` y valida que el usuario tenga el rol maestro.
+       ```json
+       {
+          "email": "nombre@maestro.edu",
+          "password": "tu_contraseña"
+       }
+       ```
+    - `POST /auth/logout` — Cierra la sesión.
+    - `GET /perfil` — Ruta protegida, muestra información del usuario autenticado.
