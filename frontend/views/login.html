@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenBook — Iniciar sesión</title>
+    <meta name="description" content="Inicia sesión en OpenBook para acceder a tu plataforma de libros digitales.">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Auth CSS -->
+    <link rel="stylesheet" href="/styles/auth.css">
+    
+    <!-- Auth JS -->
+    <script src="/js/auth.js" defer></script>
+</head>
+
+<body>
+    <!-- Header with logo and back to home -->
+    <header class="auth-header" role="banner">
+        <div class="container">
+            <a class="logo" href="/" aria-label="OpenBook — Volver al inicio">OpenBook</a>
+            <a class="back-link" href="/" aria-label="Volver al inicio">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span>Volver al inicio</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="auth-main" role="main">
+        <div class="auth-container">
+            <!-- Left side - Form -->
+            <div class="auth-form-section">
+                <div class="auth-content">
+                    <!-- Login Form -->
+                    <form id="login-form" class="auth-form" novalidate>
+                        <div class="form-header">
+                            <h1 class="form-title">Bienvenido de nuevo</h1>
+                            <p class="form-subtitle">Ingresa tus credenciales para acceder a tu cuenta</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-email" class="form-label">Correo electrónico</label>
+                            <div class="input-group">
+                                <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
+                                <input type="email" id="login-email" name="email" class="form-input" 
+                                       placeholder="tu@correo.com" autocomplete="email" required>
+                            </div>
+                            <div class="error-message" id="login-email-error"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+                                <input type="password" id="login-password" name="password" class="form-input" 
+                                       placeholder="Tu contraseña" autocomplete="current-password" required>
+                                <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="error-message" id="login-password-error"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="remember" id="login-remember">
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">Recordarme</span>
+                            </label>
+                            <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                        </div>
+
+                        <button type="submit" class="submit-btn login-btn-submit">
+                            <span class="btn-text">Iniciar sesión</span>
+                            <i class="bi bi-arrow-right btn-icon" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="form-footer">
+                            <p class="switch-form-text">
+                                ¿No tienes cuenta? 
+                                <a href="/project/views/register.html" class="switch-form-link">Regístrate aquí</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right side - Hero image and content -->
+            <div class="auth-hero-section">
+                <div class="hero-bg" aria-hidden="true">
+                    <img src="/assets/img_bg/5.jpg" alt="Fondo con temática de lectura y educación" class="hero-image">
+                    <div class="hero-overlay"></div>
+                </div>
+
+                <div class="hero-content">
+                    <h2 class="hero-title">
+                        <span class="title-line">Bienvenido de vuelta</span>
+                        <span class="title-line italic">a tu biblioteca.</span>
+                    </h2>
+                    <p class="hero-subtitle">
+                        Continúa tu aventura de lectura. Accede a tus libros favoritos, revisa tu progreso y descubre nuevas historias.
+                    </p>
+
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <i class="bi bi-bookmark-check" aria-hidden="true"></i>
+                            <span>Accede a tus libros guardados</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-graph-up" aria-hidden="true"></i>
+                            <span>Ve tu progreso de lectura</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-heart" aria-hidden="true"></i>
+                            <span>Gestiona tus favoritos</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Auth JS -->
+    <script src="/project/js/auth.js"></script>
+</body>
+
+</html>
