@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenBook — Registrarse</title>
+    <meta name="description" content="Créa tu cuenta en OpenBook y únete a la plataforma de libros digitales para estudiantes y maestros.">
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Auth CSS -->
+    <link rel="stylesheet" href="../styles/auth.css">
+</head>
+
+<body>
+    <!-- Header with logo and back to home -->
+    <header class="auth-header" role="banner">
+        <div class="container">
+            <a class="logo" href="/project/views/index.html" aria-label="OpenBook — Volver al inicio">OpenBook</a>
+            <a class="back-link" href="../views/index.html" aria-label="Volver al inicio">
+                <i class="bi bi-arrow-left" aria-hidden="true"></i>
+                <span>Volver al inicio</span>
+            </a>
+        </div>
+    </header>
+
+    <main class="auth-main" role="main">
+        <div class="auth-container">
+            <!-- Left side - Form -->
+            <div class="auth-form-section">
+                <div class="auth-content">
+                    <!-- Register Form -->
+                    <form id="register-form" class="auth-form" novalidate>
+                        <div class="form-header">
+                            <h1 class="form-title">Crear cuenta</h1>
+                            <p class="form-subtitle">Únete a OpenBook y comienza tu aventura de lectura</p>
+                        </div>
+
+                        <!-- User Type Selection -->
+                        <div class="form-group">
+                            <label class="form-label">¿Eres maestro o estudiante?</label>
+                            <div class="user-type-selection" role="radiogroup" aria-label="Seleccionar tipo de usuario">
+                                <label class="user-type-option">
+                                    <input type="radio" name="userType" value="teacher" required>
+                                    <div class="user-type-card">
+                                        <i class="bi bi-mortarboard-fill" aria-hidden="true"></i>
+                                        <span>Maestro</span>
+                                    </div>
+                                </label>
+                                <label class="user-type-option">
+                                    <input type="radio" name="userType" value="student" required>
+                                    <div class="user-type-card">
+                                        <i class="bi bi-book-fill" aria-hidden="true"></i>
+                                        <span>Estudiante</span>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="error-message" id="register-usertype-error"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName" class="form-label">Nombre completo</label>
+                                <div class="input-group">
+                                    <i class="bi bi-person input-icon" aria-hidden="true"></i>
+                                    <input type="text" id="fullName" name="fullName" class="form-input" 
+                                        placeholder="Tu nombre" autocomplete="given-name" required>
+                                </div>
+                                <div class="error-message" id="fullName-error"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nationalId" class="form-label">ID Numero</label>
+                                <div class="input-group">
+                                    <i class="bi bi-card-checklist input-icon" aria-hidden="true"></i>
+                                    <input type="number" id="nationalId" name="nationalId" class="form-input" 
+                                        placeholder="Tu numero de Identificacion" autocomplete="family-name" required>
+                                </div>
+                                <div class="error-message" id="ID-error"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Correo electrónico</label>
+                            <div class="input-group">
+                                <i class="bi bi-envelope input-icon" aria-hidden="true"></i>
+                                <input type="email" id="email" name="email" class="form-input" 
+                                    placeholder="tu@correo.com" autocomplete="email" required>
+                            </div>
+                            <div class="error-message" id="email-error"></div>
+                        </div>
+                        <div class="form-group">
+    <label for="institution" class="form-label">Institución</label>
+    <div class="input-group">
+        <i class="bi bi-person-workspace input-icon" aria-hidden="true"></i>
+        <select id="institution" name="institution" class="form-input" required>
+            <option value="">Seleccione su institución</option>
+            <option value="1">Colegio San José</option>
+    <option value="2">Colegio Marymount</option>
+    <option value="3">Colegio Alemán</option>
+    <option value="4">Colegio La Enseñanza</option>
+    <option value="5">Colegio Parrish</option>
+    <option value="6">Colegio Británico</option>
+    <option value="7">Colegio Lyndon B. Johnson</option>
+    <option value="8">Colegio Altamira</option>
+    <option value="9">Colegio Biffi</option>
+    <option value="10">Colegio IDPHUOS</option>
+        </select>
+    </div>
+    <div class="error-message" id="institution-error"></div>
+</div>
+
+                        <div class="form-group">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <div class="input-group">
+                                <i class="bi bi-lock input-icon" aria-hidden="true"></i>
+                                <input type="password" id="password" name="password" class="form-input" 
+                                    placeholder="Crea una contraseña" autocomplete="new-password" required>
+                                <button type="button" class="password-toggle" aria-label="Mostrar contraseña">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength">
+                                <div class="strength-indicator">
+                                    <div class="strength-bar"></div>
+                                </div>
+                            </div>
+                            <div class="error-message" id="password-error"></div>
+                        </div>
+
+                        <div class="form-options">
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="terms" id="register-terms" required>
+                                <span class="checkmark"></span>
+                                <span class="checkbox-text">
+                                    Acepto los <a href="#" class="terms-link">términos y condiciones</a> y la 
+                                    <a href="#" class="terms-link">política de privacidad</a>
+                                </span>
+                            </label>
+                            <div class="error-message" id="register-terms-error"></div>
+                        </div>
+
+                        <button type="submit" class="submit-btn register-btn-submit">
+                            <span class="btn-text">Crear cuenta</span>
+                            <i class="bi bi-arrow-right btn-icon" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="form-footer">
+                            <p class="switch-form-text">
+                                ¿Ya tienes cuenta? 
+                                <a href="/project/views/login.html" class="switch-form-link">Inicia sesión aquí</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Right side - Hero image and content -->
+            <div class="auth-hero-section">
+                <div class="hero-bg" aria-hidden="true">
+                    <img src="/assets/img_bg/2.jpg" alt="Fondo con temática de lectura y educación" class="hero-image">
+                    <div class="hero-overlay"></div>
+                </div>
+
+                <div class="hero-content">
+                    <h2 class="hero-title">
+                        <span class="title-line">Únete a OpenBook</span>
+                        <span class="title-line italic">y transforma tu aprendizaje.</span>
+                    </h2>
+                    <p class="hero-subtitle">
+                        Únete a miles de estudiantes y maestros que ya están transformando su experiencia educativa con OpenBook.
+                    </p>
+
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <i class="bi bi-book" aria-hidden="true"></i>
+                            <span>Catálogo extenso de libros</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-graph-up" aria-hidden="true"></i>
+                            <span>Seguimiento de progreso</span>
+                        </div>
+                        <div class="feature-item">
+                            <i class="bi bi-people" aria-hidden="true"></i>
+                            <span>Para maestros y estudiantes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Auth JS -->
+    <script src="../js/auth.js"></script>
+</body>
+
+</html>

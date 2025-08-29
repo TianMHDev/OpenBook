@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - OpenBook</title>
+    <meta name="description" content="Panel de control del profesor - OpenBook">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../styles/dashboards.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <h2 class="logo-text">OpenBook</h2>
+                    <span class="logo-badge">Teacher</span>
+                </div>
+                <button class="sidebar-toggle mobile-only" id="sidebarClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <span class="avatar-placeholder">SM</span>
+                </div>
+                <div class="user-info">
+                    <h4 class="user-name">Sebastian Marriaga</h4>
+                    <span class="user-role">Maestro</span>
+                    <span class="user-grade">Riwi</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <ul class="nav-menu">
+                    <li class="nav-item active">
+                        <a href="/frontend/views/teacher-dashboard.html" class="nav-link">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-catalog.html" class="nav-link">
+                            <i class="bi bi-collection"></i>
+                            <span>Catálogo</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-mystudents.html" class="nav-link">
+                            <i class="bi bi-people"></i>
+                            <span>Mis Estudiantes</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-favs.html" class="nav-link">
+                            <i class="bi bi-heart"></i>
+                            <span>Favoritos</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle desktop-hidden" id="sidebarOpen">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="welcome-message">
+                        <h1 class="welcome-title">¡Bienvenido, <span>Sebastian</span>! 👨‍🏫</h1>
+                        <p class="welcome-subtitle">Gestiona el progreso de tus estudiantes</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn notification-btn">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Quick Stats Cards -->
+            <section class="stats-grid">
+                <div class="stat-card primary-gradient">
+                    <div class="stat-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-value">0</h3>
+                        <p class="stat-label">Estudiantes</p>
+                        <span class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> 3 nuevos
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card success-gradient">
+                    <div class="stat-icon">
+                        <i class="bi bi-book-fill"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-value">0</h3>
+                        <p class="stat-label">Libros Asignados</p>
+                        <span class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> 12 esta semana
+                        </span>
+                    </div>
+                </div>
+
+                <div class="stat-card warning-gradient">
+                    <div class="stat-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-value">0</h3>
+                        <p class="stat-label">Completados</p>
+                        <span class="stat-change">Requieren atención</span>
+                    </div>
+                </div>
+
+                <div class="stat-card info-gradient">
+                    <div class="stat-icon">
+                        <i class="bi bi-percent"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-value">0%</h3>
+                        <p class="stat-label">Promedio Clase</p>
+                        <span class="stat-change positive">
+                            <i class="bi bi-arrow-up"></i> +5% este mes
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Quick Assignment Section -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="bi bi-lightning-charge"></i>
+                        Asignación Rápida
+                    </h2>
+                </div>
+
+                <div class="quick-assign-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="studentEmail">Correo del Estudiante</label>
+                            <div class="input-with-icon">
+                                <i class="bi bi-envelope"></i>
+                                <input type="email" id="studentEmail" placeholder="estudiante@ejemplo.com"
+                                    class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookSearch">Buscar Libro</label>
+                            <div class="search-wrapper">
+                                <div class="input-with-icon">
+                                    <i class="bi bi-search"></i>
+                                    <input type="text" id="bookSearch" placeholder="Escribe el nombre del libro..."
+                                        class="form-input" autocomplete="off">
+                                </div>
+                                <!-- Search results dropdown -->
+                                <div class="search-results" id="searchResults" style="display: none;">
+                                    <!-- Results populated with JS -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn-primary assign-btn" id="assignBookBtn">
+                                <i class="bi bi-send"></i>
+                                Asignar Libro
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Assignment Management Table -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="bi bi-list-check"></i>
+                        Gestión de Asignaciones
+                    </h2>
+                    <div class="section-actions">
+                        <button class="btn-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            Ver más
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="assignments-table">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th>Libro</th>
+                                <th>Progreso</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="student-info-cell">
+                                        <div class="student-avatar-small">JP</div>
+                                        <div>
+                                            <h5>Juan Pérez</h5>
+                                            <p>juan.perez@ejemplo.com</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="book-info-cell">
+                                        <img src="/api/placeholder/30/45" alt="Cover" class="book-thumb-small">
+                                        <div>
+                                            <h5>Don Quijote</h5>
+                                            <p>Miguel de Cervantes</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-cell">
+                                        <div class="mini-progress-bar">
+                                            <div class="progress-fill" style="width: 65%;"></div>
+                                        </div>
+                                        <span>65%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge in-progress">En Progreso</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="student-info-cell">
+                                        <div class="student-avatar-small">AM</div>
+                                        <div>
+                                            <h5>Ana Martínez</h5>
+                                            <p>ana.martinez@ejemplo.com</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="book-info-cell">
+                                        <img src="/api/placeholder/30/45" alt="Cover" class="book-thumb-small">
+                                        <div>
+                                            <h5>El Principito</h5>
+                                            <p>Antoine de Saint-Exupéry</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="progress-cell">
+                                        <div class="mini-progress-bar">
+                                            <div class="progress-fill warning" style="width: 25%;"></div>
+                                        </div>
+                                        <span>25%</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge behind">Atrasada</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

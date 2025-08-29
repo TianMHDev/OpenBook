@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo - OpenBook</title>
+    <meta name="description" content="Catálogo de libros - OpenBook">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../styles/dashboards.css">
+
+    <!-- Catalog Specific Styles -->
+    <link rel="stylesheet" href="../styles/catalog.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <h2 class="logo-text">OpenBook</h2>
+                    <span class="logo-badge">Teacher</span>
+                </div>
+                <button class="sidebar-toggle mobile-only" id="sidebarClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <span class="avatar-placeholder">SM</span>
+                </div>
+                <div class="user-info">
+                    <h4 class="user-name">Sebastian Marriaga</h4>
+                    <span class="user-role">Maestro</span>
+                    <span class="user-grade">Riwi</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-dashboard.html" class="nav-link">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="/frontend/views/teacher-catalog.html" class="nav-link">
+                            <i class="bi bi-collection"></i>
+                            <span>Catálogo</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-mystudents.html" class="nav-link">
+                            <i class="bi bi-people"></i>
+                            <span>Mis Estudiantes</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/frontend/views/teacher-favs.html" class="nav-link">
+                            <i class="bi bi-heart"></i>
+                            <span>Favoritos</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle desktop-hidden" id="sidebarOpen">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="welcome-message">
+                        <h1 class="welcome-title">Catálogo de Libros</h1>
+                        <p class="welcome-subtitle">Descubre y explora nuestra colección completa</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn notification-btn">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Catalog Content -->
+            <div class="catalog-wrapper">
+                <!-- Search and Navigation Bar -->
+                <section class="catalog-nav-section">
+                    <div class="catalog-search-bar">
+                        <div class="search-wrapper">
+                            <div class="input-with-icon">
+                                <i class="bi bi-search"></i>
+                                <input type="text" id="catalogSearch" placeholder="Buscar libros por título, autor..."
+                                    class="form-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sort and Filter Controls -->
+                    <div class="catalog-controls">
+                        <div class="sort-controls">
+                            <label for="sortSelect">Ordenar por:</label>
+                            <select id="sortSelect" class="sort-select">
+                                <option value="title">Título A-Z</option>
+                            </select>
+                        </div>
+                        <div class="results-info">
+                            <span class="results-count">Mostrando 1-20 de 900 libros</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Main Catalog Layout -->
+                <div class="catalog-content">
+                    <!-- Books Grid -->
+                    <div class="books-section">
+                        <div class="books-grid" id="booksGrid">
+                            <!-- Book Card 1 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Don Quijote" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Don Quijote de la Mancha</h3>
+                                    <p class="book-author">Miguel de Cervantes</p>
+                                    <p class="book-year">1605</p>
+                                    <span class="book-genre">Clásico</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 2 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="El Principito" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">El Principito</h3>
+                                    <p class="book-author">Antoine de Saint-Exupéry</p>
+                                    <p class="book-year">1943</p>
+                                    <span class="book-genre">Infantil</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 3 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Cien años de soledad" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                       
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Cien años de soledad</h3>
+                                    <p class="book-author">Gabriel García Márquez</p>
+                                    <p class="book-year">1967</p>
+                                    <span class="book-genre">Realismo mágico</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 4 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="1984" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">1984</h3>
+                                    <p class="book-author">George Orwell</p>
+                                    <p class="book-year">1949</p>
+                                    <span class="book-genre">Distopía</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 5 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Orgullo y prejuicio" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                       
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Orgullo y prejuicio</h3>
+                                    <p class="book-author">Jane Austen</p>
+                                    <p class="book-year">1813</p>
+                                    <span class="book-genre">Romance</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 6 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Harry Potter" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                      
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Harry Potter y la Piedra Filosofal</h3>
+                                    <p class="book-author">J.K. Rowling</p>
+                                    <p class="book-year">1997</p>
+                                    <span class="book-genre">Fantasía</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 7 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="El señor de los anillos"
+                                        class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">El Señor de los Anillos</h3>
+                                    <p class="book-author">J.R.R. Tolkien</p>
+                                    <p class="book-year">1954</p>
+                                    <span class="book-genre">Fantasía</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 8 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Crónica de una muerte anunciada"
+                                        class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                       
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Crónica de una muerte anunciada</h3>
+                                    <p class="book-author">Gabriel García Márquez</p>
+                                    <p class="book-year">1981</p>
+                                    <span class="book-genre">Drama</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 9 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="La casa de los espíritus"
+                                        class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">La casa de los espíritus</h3>
+                                    <p class="book-author">Isabel Allende</p>
+                                    <p class="book-year">1982</p>
+                                    <span class="book-genre">Drama</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 10 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="El amor en los tiempos del cólera"
+                                        class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">El amor en los tiempos del cólera</h3>
+                                    <p class="book-author">Gabriel García Márquez</p>
+                                    <p class="book-year">1985</p>
+                                    <span class="book-genre">Romance</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 11 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Fahrenheit 451" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                       
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Fahrenheit 451</h3>
+                                    <p class="book-author">Ray Bradbury</p>
+                                    <p class="book-year">1953</p>
+                                    <span class="book-genre">Ciencia ficción</span>
+                                </div>
+                            </div>
+
+                            <!-- Book Card 12 -->
+                            <div class="book-card">
+                                <div class="book-cover-container">
+                                    <img src="/api/placeholder/180/260" alt="Matar a un ruiseñor" class="book-cover">
+                                    <div class="book-actions">
+                                        <button class="action-btn-small favorite-btn">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                        
+                                    </div>
+                                </div>
+                                <div class="book-info">
+                                    <h3 class="book-title">Matar a un ruiseñor</h3>
+                                    <p class="book-author">Harper Lee</p>
+                                    <p class="book-year">1960</p>
+                                    <span class="book-genre">Drama</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination-wrapper">
+                            <button class="pagination-btn" disabled>
+                                <i class="bi bi-chevron-left"></i>
+                                Anterior
+                            </button>
+                            <div class="pagination-numbers">
+                                <button class="page-number active">1</button>
+                                <button class="page-number">2</button>
+                                <button class="page-number">3</button>
+                                <span class="pagination-dots">...</span>
+                                <button class="page-number">45</button>
+                            </div>
+                            <button class="pagination-btn">
+                                Siguiente
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>
