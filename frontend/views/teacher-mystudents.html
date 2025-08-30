@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - OpenBook</title>
+    <meta name="description" content="Panel de control del profesor - OpenBook">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../styles/dashboards.css">
+
+    <!-- Teacher - My Students Styles -->
+    <link rel="stylesheet" href="../styles/teacher-mystudents.css">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-wrapper">
+                    <h2 class="logo-text">OpenBook</h2>
+                    <span class="logo-badge">Teacher</span>
+                </div>
+                <button class="sidebar-toggle mobile-only" id="sidebarClose">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="user-profile">
+                <div class="user-avatar">
+                    <span class="avatar-placeholder">SM</span>
+                </div>
+                <div class="user-info">
+                    <h4 class="user-name">Sebastian Marriaga</h4>
+                    <span class="user-role">Maestro</span>
+                    <span class="user-grade">Riwi</span>
+                </div>
+            </div>
+
+            <div class="nav-section">
+                <ul class="nav-menu">
+                    <li class="nav-item ">
+                        <a href="../views/teacher-dashboard.html" class="nav-link">
+                            <i class="bi bi-grid-1x2-fill"></i>
+                            <span>Dashboard</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../views/teacher-catalog.html" class="nav-link">
+                            <i class="bi bi-collection"></i>
+                            <span>Catálogo</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="../views/teacher-mystudents.html" class="nav-link">
+                            <i class="bi bi-people"></i>
+                            <span>Mis Estudiantes</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="../views/teacher-favs.html" class="nav-link">
+                            <i class="bi bi-heart"></i>
+                            <span>Favoritos</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="btn-logout" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle desktop-hidden" id="sidebarOpen">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <div class="welcome-message">
+                        <h1 class="welcome-title">Mis Estudiantes</h1>
+                        <p class="welcome-subtitle">Gestiona y supervisa el progreso de todos tus estudiantes</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn notification-btn">
+                        <i class="bi bi-bell"></i>
+                        <span class="notification-dot"></span>
+                    </button>
+                </div>
+            </header>
+
+
+            <!-- Students Management Section -->
+            <section class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="bi bi-people-fill"></i>
+                        Lista de Estudiantes
+                    </h2>
+                    <div class="section-actions">
+                        <div class="search-input-wrapper">
+                            <input type="text" placeholder="Buscar estudiante..." class="search-input">
+                            <i class="bi bi-search search-icon"></i>
+                        </div>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active">Todos</button>
+                            <button class="filter-tab">Activos</button>
+                            <button class="filter-tab">Atrasados</button>
+                            <button class="filter-tab">Completados</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Grid -->
+                <div class="students-grid">
+                    <!-- Student Card 1 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">JP</div>
+                            <div class="student-info">
+                                <h4 class="student-name">Juan Pérez</h4>
+                                <p class="student-email">juan.perez@ejemplo.com</p>
+                                <span class="student-status active">Activo</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">5</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">3</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">85%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Lectura Actual</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>Don Quijote de la Mancha</h6>
+                                    <p>Miguel de Cervantes</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 65%;"></div>
+                                    </div>
+                                    <span class="progress-text">65% completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Card 2 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">AM</div>
+                            <div class="student-info">
+                                <h4 class="student-name">Ana Martínez</h4>
+                                <p class="student-email">ana.martinez@ejemplo.com</p>
+                                <span class="student-status behind">Atrasada</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">4</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">1</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">35%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Lectura Actual</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>El Principito</h6>
+                                    <p>Antoine de Saint-Exupéry</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill warning" style="width: 25%;"></div>
+                                    </div>
+                                    <span class="progress-text">25% completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Card 3 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">CR</div>
+                            <div class="student-info">
+                                <h4 class="student-name">Carlos Rodríguez</h4>
+                                <p class="student-email">carlos.rodriguez@ejemplo.com</p>
+                                <span class="student-status active">Activo</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">6</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">5</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">92%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Lectura Actual</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>1984</h6>
+                                    <p>George Orwell</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 78%;"></div>
+                                    </div>
+                                    <span class="progress-text">78% completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Card 4 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">LS</div>
+                            <div class="student-info">
+                                <h4 class="student-name">Laura Silva</h4>
+                                <p class="student-email">laura.silva@ejemplo.com</p>
+                                <span class="student-status completed">Completó Todo</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">3</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">3</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">100%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Última Lectura</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>Cien Años de Soledad</h6>
+                                    <p>Gabriel García Márquez</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill success" style="width: 100%;"></div>
+                                    </div>
+                                    <span class="progress-text">Completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Card 5 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">MG</div>
+                            <div class="student-info">
+                                <h4 class="student-name">María García</h4>
+                                <p class="student-email">maria.garcia@ejemplo.com</p>
+                                <span class="student-status behind">Atrasada</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">4</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">15%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Lectura Actual</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>Orgullo y Prejuicio</h6>
+                                    <p>Jane Austen</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill warning" style="width: 15%;"></div>
+                                    </div>
+                                    <span class="progress-text">15% completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student Card 6 -->
+                    <div class="student-card">
+                        <div class="student-header">
+                            <div class="student-avatar-large">DL</div>
+                            <div class="student-info">
+                                <h4 class="student-name">Diego López</h4>
+                                <p class="student-email">diego.lopez@ejemplo.com</p>
+                                <span class="student-status active">Activo</span>
+                            </div>
+                            <div class="student-actions">
+                                <button class="btn-action" title="Enviar mensaje">
+                                    <i class="bi bi-chat-dots"></i>
+                                </button>
+                                <button class="btn-action" title="Ver detalles">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="student-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Libros Asignados</span>
+                                <span class="stat-value">5</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Completados</span>
+                                <span class="stat-value">2</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Progreso Promedio</span>
+                                <span class="stat-value">68%</span>
+                            </div>
+                        </div>
+
+                        <div class="current-reading">
+                            <h5 class="reading-title">Lectura Actual</h5>
+                            <div class="current-book">
+                                <img src="/api/placeholder/40/60" alt="Book Cover" class="current-book-thumb">
+                                <div class="current-book-info">
+                                    <h6>El Gran Gatsby</h6>
+                                    <p>F. Scott Fitzgerald</p>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 45%;"></div>
+                                    </div>
+                                    <span class="progress-text">45% completado</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
