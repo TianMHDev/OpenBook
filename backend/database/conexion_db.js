@@ -1,12 +1,12 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
 
-dotenv.config(); // Cargar variables de entorno desde el archivo .env
+dotenv.config(); // Loading Environment Variables from the .env File
 
-// Crear un pool de conexiones a la base de datos MySQL 
-// Utilizando las variables de entorno para la configuración
-// Asegúrate de que las variables de entorno estén definidas en tu archivo .env
-// y que el archivo .env esté en la raíz del proyecto.
+// Creating a MySQL Database Connection Pool
+// Using Environment Variables for Configuration
+// Make sure the environment variables are defined in your .env file
+// and that the .env file is in the project root.
 
 export const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -20,9 +20,9 @@ export const pool = mysql.createPool({
 
 export const checkConnection = async () => {
   try {
-    const connection = await pool.getConnection(); // obtener conexión
+    const connection = await pool.getConnection(); // get connection
     console.log('✅ Connection to MySQL established');
-    connection.release(); // liberar conexión
+    connection.release(); // release connection
   } catch (error) {
     console.error('❌ Error connecting to MySQL:', error.message);
   }

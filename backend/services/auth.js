@@ -11,7 +11,7 @@ const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_aqui_cambiar_en_produccion";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
 
-// Configuración de roles del sistema - FUENTE ÚNICA DE VERDAD
+// System Role Configuration - SINGLE SOURCE OF TRUTH
 const ROLES = {
     TEACHER: {
         id: 1,
@@ -27,73 +27,74 @@ const ROLES = {
     }
 };
 
-// Configuración de seguridad para contraseñas
+// Password security settings
 const PASSWORD_CONFIG = {
     minLength: 8,
-    saltRounds: 12, // Nivel alto de seguridad para bcrypt
-    requireComplexity: true // Mayúsculas, minúsculas y números
+    saltRounds: 12, // High level of security for bcrypt
+    requireComplexity: true // Uppercase, lowercase, and numbers
 };
 
-// =====================================================================
-// MIDDLEWARE DE CORS Y CONFIGURACIÓN
-// =====================================================================
+// ============================================================================
+// CORS MIDDLEWARE AND CONFIGURATION
+// =========================================================================
 
 router.use((req, res, next) => {
-    // Configuración CORS - en producción, especificar dominios exactos
+    // CORS Configuration - In production, specify exact domains
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     
-    // Manejar peticiones OPTIONS (preflight)
+    // Handling OPTIONS requests (preflight)
     if (req.method === 'OPTIONS') {
         return res.status(200).end();
     }
     next();
 });
 
-// =====================================================================
-// FUNCIONES DE VALIDACIÓN CENTRAL - LÓGICA DE NEGOCIO CRÍTICA
-// =====================================================================
+// ==========================================================================
+// CORE VALIDATION FUNCTIONS - CRITICAL BUSINESS LOGIC
+// ===================================================================================
 
 /**
- * Valida el formato de email según el rol de manera ESTRICTA
- * Esta es la función más importante del sistema - define quién puede registrarse
+* STRICTLY validates the email format according to the role
+* This is the most important function of the system - it defines who can register
+*
+* BUSINESS RULE: Only specific institutional emails per role
+* - Teachers: ONLY @maestro.edu.co
+* - Students: ONLY @estudiante.edu.co
  * 
- * REGLA DE NEGOCIO: Solo correos institucionales específicos por rol
- * - Maestros: SOLO @maestro.edu.co
- * - Estudiantes: SOLO @estudiante.edu.co
+ * @param {string} email - Email to validate
  * 
- * @param {string} email - Correo electrónico a validar
- * @param {number} roleId - ID del rol (1=maestro, 2=estudiante)
- * @returns {boolean} - true si el email es válido para el rol
+ * @param {number} roleId - Role ID (1=teacher, 2=student)
+ * @returns {boolean} - true if the email is valid for the role
  */
 function validateEmailFormatStrict(email, roleId) {
-    // Validaciones de entrada básicas
+    // Basic input validations
     if (!email || !roleId) {
         console.log('Validación fallida: email o roleId faltantes');
         return false;
     }
     
-    // Normalizar email - siempre en minúsculas y sin espacios
+    // Normalize email - always in lowercase and without spaces
     const emailNormalized = email.toLowerCase().trim();
     
-    // Validar formato básico de email usando expresión regular
+    // Validate basic email format using regular expression
     const basicEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!basicEmailRegex.test(emailNormalized)) {
         console.log('Validación fallida: formato básico de email inválido');
         return false;
     }
     
-    // Validación ESTRICTA por rol - aquí está la lógica de negocio clave
+    // STRICT validation by role - here is the key business logic
     switch (parseInt(roleId)) {
         case ROLES.TEACHER.id:
-            // Los maestros SOLO pueden usar el dominio específico
+            // Teachers can ONLY use the specific domain
             const isValidTeacherEmail = emailNormalized.endsWith(`@${ROLES.TEACHER.domain}`);
             console.log(`Validando email de maestro: ${emailNormalized} - Válido: ${isValidTeacherEmail}`);
             return isValidTeacherEmail;
             
         case ROLES.STUDENT.id:
-            // Los estudiantes SOLO pueden usar el dominio específico
+            // Students may ONLY use the specific domain
             const isValidStudentEmail = emailNormalized.endsWith(`@${ROLES.STUDENT.domain}`);
             console.log(`Validando email de estudiante: ${emailNormalized} - Válido: ${isValidStudentEmail}`);
             return isValidStudentEmail;
@@ -105,22 +106,22 @@ function validateEmailFormatStrict(email, roleId) {
 }
 
 /**
- * Verifica la concordancia estricta entre rol y dominio del email
- * Esta función implementa la regla de negocio más importante:
- * "El rol seleccionado DEBE coincidir EXACTAMENTE con el dominio del correo"
+ * Checks for strict matching between role and email domain
+* This feature implements the most important business rule:
+* "The selected role MUST EXACTLY match the email domain."
  * 
- * @param {string} email - Correo electrónico
- * @param {number} roleId - ID del rol seleccionado
+ * @param {string} email - email
+ * @param {number} roleId - ID of the selected role
  * @returns {Object} - { isValid: boolean, reason: string }
  */
 function validateRoleEmailMatch(email, roleId) {
     const emailNormalized = email.toLowerCase().trim();
     const roleIdInt = parseInt(roleId);
     
-    // Determinar el dominio del email
+    // Determine the email domain
     const emailDomain = emailNormalized.split('@')[1];
     
-    // Verificar concordancia estricta
+    // Check strict match
     if (roleIdInt === ROLES.TEACHER.id) {
         if (emailDomain === ROLES.TEACHER.domain) {
             return { isValid: true, reason: 'Concordancia válida: maestro con dominio maestro' };
@@ -147,30 +148,30 @@ function validateRoleEmailMatch(email, roleId) {
 }
 
 /**
- * Valida la fortaleza de la contraseña según políticas de seguridad
- * @param {string} password - Contraseña a validar
+ * Validates password strength according to security policies
+ * @param {string} password - Password to validate
  * @returns {Object} - { isValid: boolean, errors: string[] }
  */
 function validatePasswordStrength(password) {
     const errors = [];
     
-    // Verificar longitud mínima
+    // Check minimum length
     if (!password || password.length < PASSWORD_CONFIG.minLength) {
         errors.push(`La contraseña debe tener al menos ${PASSWORD_CONFIG.minLength} caracteres`);
     }
     
     if (PASSWORD_CONFIG.requireComplexity) {
-        // Verificar mayúsculas
+        // Check upercase
         if (!/[A-Z]/.test(password)) {
             errors.push('La contraseña debe incluir al menos una mayúscula');
         }
         
-        // Verificar minúsculas  
+        // Check lowercase  
         if (!/[a-z]/.test(password)) {
             errors.push('La contraseña debe incluir al menos una minúscula');
         }
         
-        // Verificar números
+        // Check numbers
         if (!/\d/.test(password)) {
             errors.push('La contraseña debe incluir al menos un número');
         }
@@ -182,14 +183,14 @@ function validatePasswordStrength(password) {
     };
 }
 
-// =====================================================================
-// FUNCIONES DE BASE DE DATOS
-// =====================================================================
+// ==============================================================================
+// DATABASE FUNCTIONS
+// ========================================================================
 
 /**
- * Verifica si un email ya existe en la base de datos
- * @param {string} email - Email a verificar
- * @returns {Promise<boolean>} - true si el email ya existe
+ * Check if an email already exists in the database
+ * @param {string} email - Email to verify
+ * @returns {Promise<boolean>} - true if the email already exists
  */
 async function emailExists(email) {
     try {
@@ -203,9 +204,9 @@ async function emailExists(email) {
 }
 
 /**
- * Verifica si un número de identificación ya existe
- * @param {string} nationalId - Número de identificación
- * @returns {Promise<boolean>} - true si el ID ya existe
+ * Check if an ID number already exists
+ * @param {string} nationalId - Identification number
+ * @returns {Promise<boolean>} - true if the ID already exists
  */
 async function nationalIdExists(nationalId) {
     try {
@@ -219,9 +220,9 @@ async function nationalIdExists(nationalId) {
 }
 
 /**
- * Verifica si una institución existe
- * @param {number} institutionId - ID de la institución
- * @returns {Promise<boolean>} - true si la institución existe
+ * Check if an institution exists
+ * @param {number} institutionId - Institution ID
+ * @returns {Promise<boolean>} - true if the institution exists
  */
 async function institutionExists(institutionId) {
     try {
@@ -234,9 +235,9 @@ async function institutionExists(institutionId) {
     }
 }
 
-// =====================================================================
-// ENDPOINT: REGISTRO DE USUARIOS - VALIDACIÓN EXHAUSTIVA
-// =====================================================================
+// ============================================================================
+// ENDPOINT: USER REGISTRATION - EXHAUSTIVE VALIDATION
+// ===========================================================================
 
 router.post("/register", async (req, res) => {
     console.log('=== INICIO PROCESO DE REGISTRO ===');
@@ -245,7 +246,7 @@ router.post("/register", async (req, res) => {
     const { full_name, national_id, email, password, role_id, institution_id } = req.body;
 
     // ========================================
-    // FASE 1: VALIDACIÓN DE CAMPOS REQUERIDOS
+    // PHASE 1: VALIDATION OF REQUIRED FIELDS
     // ========================================
     
     const requiredFields = { full_name, national_id, email, password, role_id, institution_id };
@@ -263,7 +264,7 @@ router.post("/register", async (req, res) => {
     }
 
     // ========================================
-    // FASE 2: NORMALIZACIÓN DE DATOS
+    // PHASE 2: DATA NORMALIZATION
     // ========================================
     
     const normalizedEmail = email.toLowerCase().trim();
@@ -278,10 +279,10 @@ router.post("/register", async (req, res) => {
     });
 
     // ========================================
-    // FASE 3: VALIDACIONES DE FORMATO Y LÓGICA DE NEGOCIO
+    // PHASE 3: FORMAT VALIDATIONS AND BUSINESS LOGIC
     // ========================================
 
-    // Validar nombre (longitud mínima)
+    // Validate name (minimum length)
     if (normalizedName.length < 3) {
         return res.status(400).json({ 
             mensaje: "El nombre debe tener al menos 3 caracteres",
@@ -289,7 +290,7 @@ router.post("/register", async (req, res) => {
         });
     }
 
-    // Validar número de identificación (solo números, 7-12 dígitos)
+    // Validate ID number (numbers only, 7-12 digits)
     if (!/^\d{7,12}$/.test(national_id)) {
         return res.status(400).json({ 
             mensaje: "Número de identificación inválido (debe tener entre 7 y 12 dígitos)",
@@ -297,7 +298,7 @@ router.post("/register", async (req, res) => {
         });
     }
 
-    // Validar que el rol sea válido (solo maestro=1 o estudiante=2)
+    // Validate that the role is valid (only teacher=1 or student=2)
     if (![ROLES.TEACHER.id, ROLES.STUDENT.id].includes(roleIdInt)) {
         console.log('Rol inválido proporcionado:', roleIdInt);
         return res.status(400).json({ 
@@ -307,7 +308,7 @@ router.post("/register", async (req, res) => {
     }
 
     // ========================================
-    // FASE 4: VALIDACIÓN CRÍTICA - FORMATO DE EMAIL SEGÚN ROL
+    // PHASE 4: CRITICAL VALIDATION - EMAIL FORMAT ACCORDING TO ROLE
     // ========================================
     
     console.log('=== VALIDANDO FORMATO DE EMAIL SEGÚN ROL ===');
@@ -324,7 +325,7 @@ router.post("/register", async (req, res) => {
     }
 
     // ========================================  
-    // FASE 5: VALIDACIÓN CRÍTICA - CONCORDANCIA ROL-EMAIL
+    // PHASE 5: CRITICAL VALIDATION - ROLE-EMAIL CONCORDANCE
     // ========================================
     
     console.log('=== VALIDANDO CONCORDANCIA ROL-EMAIL ===');
@@ -343,7 +344,7 @@ router.post("/register", async (req, res) => {
     console.log('Concordancia rol-email válida:', roleEmailMatch.reason);
 
     // ========================================
-    // FASE 6: VALIDACIÓN DE CONTRASEÑA
+    // PHASE 6: PASSWORD VALIDATION
     // ========================================
     
     const passwordValidation = validatePasswordStrength(password);
@@ -358,13 +359,13 @@ router.post("/register", async (req, res) => {
     }
 
     // ========================================
-    // FASE 7: VALIDACIONES DE BASE DE DATOS
-    // ========================================
+    // PHASE 7: DATABASE VALIDATIONS
+//========================================
 
     try {
         console.log('=== VERIFICANDO DUPLICADOS EN BASE DE DATOS ===');
         
-        // Verificar email duplicado
+        // Check for duplicate emails
         const emailDuplicate = await emailExists(normalizedEmail);
         if (emailDuplicate) {
             console.log('Email ya registrado:', normalizedEmail);
@@ -374,7 +375,7 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Verificar ID nacional duplicado
+        // Check duplicate national ID
         const idDuplicate = await nationalIdExists(national_id);
         if (idDuplicate) {
             console.log('ID nacional ya registrado:', national_id);
@@ -384,7 +385,7 @@ router.post("/register", async (req, res) => {
             });
         }
 
-        // Verificar que la institución exista
+        // Verify that the institution exists
         const institutionValid = await institutionExists(institutionIdInt);
         if (!institutionValid) {
             console.log('Institución no válida:', institutionIdInt);
@@ -397,16 +398,18 @@ router.post("/register", async (req, res) => {
         console.log('Todas las validaciones de BD pasaron correctamente');
 
         // ========================================
-        // FASE 8: CREACIÓN DEL USUARIO
+        // PHASE 8: USER CREATION
         // ========================================
 
         console.log('=== PROCEDIENDO CON LA CREACIÓN DEL USUARIO ===');
         
-        // Cifrar contraseña con alta seguridad
+        // Encrypt password with high security
+
         const hashedPassword = await bcrypt.hash(password, PASSWORD_CONFIG.saltRounds);
         console.log('Contraseña cifrada correctamente');
 
-        // Insertar usuario en la base de datos
+        // Insert user into the database
+
         const insertQuery = `
             INSERT INTO users (full_name, national_id, email, password, role_id, institution_id, created_at) 
             VALUES (?, ?, ?, ?, ?, ?, NOW())
@@ -424,10 +427,10 @@ router.post("/register", async (req, res) => {
         console.log('Usuario creado exitosamente con ID:', result.insertId);
 
         // ========================================
-        // FASE 9: GENERACIÓN DE TOKEN Y RESPUESTA
+        // PHASE 9: TOKEN GENERATION AND RESPONSE
         // ========================================
 
-        // Crear payload del JWT (datos no sensibles)
+        // Create JWT payload (non-sensitive data)
         const userPayload = {
             user_id: result.insertId,
             email: normalizedEmail,
@@ -436,7 +439,7 @@ router.post("/register", async (req, res) => {
             institution_id: institutionIdInt
         };
 
-        // Generar token JWT para login automático
+        // Generate JWT token for automatic login
         const token = jwt.sign(userPayload, JWT_SECRET, { 
             expiresIn: JWT_EXPIRES_IN,
             issuer: 'auth-system',
@@ -446,21 +449,22 @@ router.post("/register", async (req, res) => {
         console.log('Token JWT generado para usuario:', result.insertId);
         console.log('=== REGISTRO COMPLETADO EXITOSAMENTE ===');
 
-        // Respuesta exitosa con toda la información necesaria
+        // Successful response with all necessary information
         res.status(201).json({
             mensaje: "Usuario registrado correctamente",
             success: true,
             user_id: result.insertId,
             token,
             user: userPayload,
-            // Información adicional para el frontend
+            // Additional information for the frontend
             redirect: roleIdInt === ROLES.TEACHER.id ? '/teacher-dashboard' : '/student-dashboard'
         });
 
     } catch (error) {
         console.error("Error crítico en el registro:", error);
         
-        // Manejo de errores específicos de base de datos
+        // Handling database-specific errors
+
         if (error.code === "ER_DUP_ENTRY") {
             if (error.message.includes('email')) {
                 return res.status(409).json({ 
@@ -476,7 +480,7 @@ router.post("/register", async (req, res) => {
             }
         }
 
-        // Error genérico para no exponer detalles internos
+        // Generic error for not exposing internal details
         res.status(500).json({ 
             mensaje: "Error interno del servidor durante el registro",
             error: "SERVER_ERROR"
@@ -485,7 +489,7 @@ router.post("/register", async (req, res) => {
 });
 
 // =====================================================================
-// ENDPOINT: LOGIN DE USUARIOS
+// ENDPOINT: USER LOGIN
 // =====================================================================
 
 router.post("/login", async (req, res) => {
@@ -506,7 +510,7 @@ router.post("/login", async (req, res) => {
     console.log('Intento de login para email:', normalizedEmail);
 
     try {
-        // Buscar usuario en la base de datos con información de institución
+        // Search for user in the database with institution information
         const query = `
             SELECT u.user_id, u.email, u.password, u.role_id, u.institution_id, 
                 u.full_name, u.created_at, u.last_login,
@@ -522,7 +526,7 @@ router.post("/login", async (req, res) => {
 
         if (results.length === 0) {
             console.log('Usuario no encontrado:', normalizedEmail);
-            // IMPORTANTE: No revelar si el email existe o no por seguridad
+            // IMPORTANT: Do not reveal whether the email exists or not for security reasons.
             return res.status(401).json({ 
                 mensaje: "Credenciales incorrectas",
                 error: "INVALID_CREDENTIALS"
@@ -532,7 +536,7 @@ router.post("/login", async (req, res) => {
         const user = results[0];
         console.log('Usuario encontrado, verificando contraseña...');
 
-        // Verificar contraseña usando bcrypt
+        // Verify password using bcrypt
         const isValidPassword = await bcrypt.compare(password, user.password);
 
         if (!isValidPassword) {
@@ -545,7 +549,7 @@ router.post("/login", async (req, res) => {
 
         console.log('Credenciales válidas, generando sesión...');
 
-        // Crear payload del JWT (excluir información sensible)
+        // Create JWT payload (exclude sensitive information)
         const userPayload = {
             user_id: user.user_id,
             email: user.email,
@@ -556,27 +560,27 @@ router.post("/login", async (req, res) => {
             role_name: user.role_name
         };
 
-        // Generar token JWT
+        // Generate JWT token
         const token = jwt.sign(userPayload, JWT_SECRET, { 
             expiresIn: JWT_EXPIRES_IN,
             issuer: 'auth-system',
             audience: 'edu-platform'
         });
 
-        // Actualizar último login en la base de datos
+        // Update last login in the database
         const updateLoginQuery = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
         await pool.query(updateLoginQuery, [user.user_id]);
 
         console.log('Login exitoso para usuario:', user.user_id);
         console.log('=== LOGIN COMPLETADO ===');
 
-        // Respuesta exitosa
+        // Successful response
         res.status(200).json({
             mensaje: "Login exitoso",
             success: true,
             token,
             user: userPayload,
-            // Información para redirección
+            // Information for redirection
             redirect: user.role_id === ROLES.TEACHER.id ? '/teacher-dashboard' : '/student-dashboard'
         });
 
@@ -590,16 +594,16 @@ router.post("/login", async (req, res) => {
 });
 
 // =====================================================================
-// ENDPOINTS ADICIONALES DE GESTIÓN DE SESIÓN
+// ADDITIONAL SESSION MANAGEMENT ENDPOINTS
 // =====================================================================
 
 /**
- * Endpoint para cerrar sesión
- * Registra el evento de logout (útil para auditoría)
+ * Logout endpoint
+* Logs the logout event (useful for auditing)
  */
 router.post("/logout", verificarToken, async (req, res) => {
     try {
-        // Registrar logout en la base de datos para auditoría
+        // Record logout in the database for auditing
         const logoutQuery = "UPDATE users SET last_logout = NOW() WHERE user_id = ?";
         await pool.query(logoutQuery, [req.user.user_id]);
 
@@ -612,7 +616,7 @@ router.post("/logout", verificarToken, async (req, res) => {
         });
     } catch (error) {
         console.error("Error registrando logout:", error);
-        // Aún así confirmamos el logout al cliente
+        // We still confirm the logout to the client.
         res.json({
             mensaje: "Logout procesado",
             success: true,
@@ -622,9 +626,9 @@ router.post("/logout", verificarToken, async (req, res) => {
 });
 
 /**
- * Endpoint para verificar si un token es válido
- * Útil para validar sesiones existentes
- */
+ * Endpoint to verify if a token is valid
+* Useful for validating existing sessions
+*/
 router.get("/verify-token", verificarToken, (req, res) => {
     res.json({
         mensaje: "Token válido",
@@ -635,7 +639,7 @@ router.get("/verify-token", verificarToken, (req, res) => {
 });
 
 /**
- * Endpoint para obtener perfil completo del usuario
+ *Endpoint to obtain a complete user profile
  */
 router.get("/profile", verificarToken, async (req, res) => {
     try {
@@ -677,8 +681,8 @@ router.get("/profile", verificarToken, async (req, res) => {
 });
 
 /**
- * Endpoint para verificar disponibilidad de email
- * Útil para validación en tiempo real en el frontend
+ * Endpoint for checking email availability
+* Useful for real-time validation on the front end
  */
 router.post("/check-email", async (req, res) => {
     const { email, role_id } = req.body;
@@ -693,7 +697,7 @@ router.post("/check-email", async (req, res) => {
     const normalizedEmail = email.toLowerCase().trim();
 
     try {
-        // Si se proporciona role_id, validar formato
+        // If role_id is provided, validate format
         if (role_id && !validateEmailFormatStrict(normalizedEmail, parseInt(role_id))) {
             const expectedDomain = parseInt(role_id) === ROLES.TEACHER.id ? ROLES.TEACHER.domain : ROLES.STUDENT.domain;
             return res.status(400).json({ 
@@ -704,7 +708,7 @@ router.post("/check-email", async (req, res) => {
             });
         }
 
-        // Verificar disponibilidad
+        // Check availability
         const exists = await emailExists(normalizedEmail);
         
         res.json({
@@ -724,7 +728,7 @@ router.post("/check-email", async (req, res) => {
 });
 
 // =====================================================================
-// EXPORTAR ROUTER
+// EXPORT ROUTER
 // =====================================================================
 
 export default router;

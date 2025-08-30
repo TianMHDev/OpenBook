@@ -1,4 +1,4 @@
-// Cargar variables de entorno y librerías
+// Load environment variables and libraries
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
@@ -11,22 +11,21 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "tu_clave_secreta_aqui";
 
-// Configuración middleware
+// Middleware Configuration
 app.use(cors());
 app.use(express.json());
 
-// Configurar archivos estáticos
+// Configure static files
 app.use(express.static('frontend'));
 app.use('/assets', express.static('frontend/assets'));
 
-// Ruta principal
+// Main route
 app.get('/', (req, res) => {
     res.sendFile('frontend/views/index.html', { root: '.' });
 });
 
-// ==================== FUNCIONES AUXILIARES ====================
-
-// Manejar errores de base de datos
+// ==================== AUXILIARY FUNCTIONS ====================
+// Handling database errors
 function manejarError(error, res, mensaje = "Error en el servidor") {
     console.error("❌", mensaje, error.message);
     res.status(500).json({
@@ -36,7 +35,7 @@ function manejarError(error, res, mensaje = "Error en el servidor") {
     });
 }
 
-// Respuesta exitosa
+// Successful response
 function respuestaOK(res, data, mensaje = "Operación exitosa") {
     res.status(200).json({
         success: true,
@@ -45,7 +44,7 @@ function respuestaOK(res, data, mensaje = "Operación exitosa") {
     });
 }
 
-// Verificar token JWT (middleware)
+// Verify JWT token (middleware)
 export function verificarToken(req, res, next) {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
@@ -68,9 +67,9 @@ export function verificarToken(req, res, next) {
     }
 }
 app.use("/api/auth", authRoutes);
-// ==================== LIBROS PÚBLICOS ====================
+// ===================== PUBLIC BOOKS ====================
 
-// 📚 GET /api/books - Obtener libros con filtros y paginación
+// 📚 GET /api/books - Get books with filters and pagination
 app.get('/api/books', async (req, res) => {
     try {
         const pagina = parseInt(req.query.page) || 1;
@@ -130,7 +129,7 @@ app.get('/api/books', async (req, res) => {
 
         const [libros] = await pool.query(query, params);
 
-        // Contar total
+        // Count total
         let queryConteo = "SELECT COUNT(DISTINCT b.book_id) as total FROM books b";
         if (busqueda || genero || año) {
             queryConteo += " LEFT JOIN books_genres bg ON b.book_id = bg.book_id LEFT JOIN genres g ON bg.genre_id = g.genre_id";
@@ -157,12 +156,12 @@ app.get('/api/books', async (req, res) => {
     }
 });
 
-// 📖 GET /api/books/:id - Obtener libro específico y aumentar vistas
+// 📖 GET /api/books/:id - Get specific book and increase views
 app.get('/api/books/:id', async (req, res) => {
     try {
         const bookId = req.params.id;
 
-        // Obtener libro
+        // Get book
         const query = `
             SELECT 
                 b.book_id,
@@ -192,7 +191,7 @@ app.get('/api/books/:id', async (req, res) => {
             });
         }
 
-        // Aumentar contador de vistas
+        // Increase view counter
         await pool.query(`
             INSERT INTO book_metrics (book_id, views) VALUES (?, 1)
             ON DUPLICATE KEY UPDATE views = views + 1
@@ -205,9 +204,9 @@ app.get('/api/books/:id', async (req, res) => {
     }
 });
 
-// ==================== GÉNEROS ====================
+// ==================== GENRES ====================
 
-// 🎭 GET /api/genres - Obtener todos los géneros
+// 🎭 GET /api/genres - Get all genres
 app.get('/api/genres', async (req, res) => {
     try {
         const [generos] = await pool.query(`
@@ -229,28 +228,27 @@ app.get('/api/genres', async (req, res) => {
     }
 });
 
-// ==================== INTERACCIONES DE USUARIO (REQUIEREN LOGIN) ====================
-
-// ❤️ POST /api/books/:id/like - Dar like a un libro
+// ===================== USER INTERACTIONS (REQUIRE LOGIN) =====================
+// ❤️ POST /api/books/:id/like - Like a book
 app.post('/api/books/:id/like', verificarToken, async (req, res) => {
     try {
         const bookId = req.params.id;
         const userId = req.user.user_id;
 
-        // Verificar si ya dio like
+        // Check if you have already liked it
         const [likeExistente] = await pool.query(
             "SELECT reaction_id FROM books_reactions WHERE user_id = ? AND book_id = ? AND reaction_type = 'like'",
             [userId, bookId]
         );
 
         if (likeExistente.length > 0) {
-            // Quitar like
+            // Remove like
             await pool.query(
                 "DELETE FROM books_reactions WHERE user_id = ? AND book_id = ? AND reaction_type = 'like'",
                 [userId, bookId]
             );
 
-            // Reducir contador
+            // Reduce counter
             await pool.query(`
                 INSERT INTO book_metrics (book_id, likes) VALUES (?, 0)
                 ON DUPLICATE KEY UPDATE likes = GREATEST(likes - 1, 0)
@@ -258,13 +256,13 @@ app.post('/api/books/:id/like', verificarToken, async (req, res) => {
 
             respuestaOK(res, { liked: false }, "Like removido");
         } else {
-            // Agregar like
+            // Add like
             await pool.query(
                 "INSERT INTO books_reactions (user_id, book_id, reaction_type) VALUES (?, ?, 'like')",
                 [userId, bookId]
             );
 
-            // Aumentar contador
+            // Increase counter
             await pool.query(`
                 INSERT INTO book_metrics (book_id, likes) VALUES (?, 1)
                 ON DUPLICATE KEY UPDATE likes = likes + 1
@@ -278,26 +276,26 @@ app.post('/api/books/:id/like', verificarToken, async (req, res) => {
     }
 });
 
-// ⭐ POST /api/books/:id/favorite - Agregar/quitar de favoritos
+// ⭐ POST /api/books/:id/favorite - Add/remove from favorites
 app.post('/api/books/:id/favorite', verificarToken, async (req, res) => {
     try {
         const bookId = req.params.id;
         const userId = req.user.user_id;
 
-        // Verificar si ya está en favoritos
+        // Check if it's already in favorites
         const [favoritoExistente] = await pool.query(
             "SELECT user_id FROM users_books WHERE user_id = ? AND book_id = ? AND status = 'favoritos'",
             [userId, bookId]
         );
 
         if (favoritoExistente.length > 0) {
-            // Quitar de favoritos
+            // Remove from favorites
             await pool.query(
                 "DELETE FROM users_books WHERE user_id = ? AND book_id = ? AND status = 'favoritos'",
                 [userId, bookId]
             );
 
-            // Reducir contador
+            // Reduce counter
             await pool.query(`
                 INSERT INTO book_metrics (book_id, favorites) VALUES (?, 0)
                 ON DUPLICATE KEY UPDATE favorites = GREATEST(favorites - 1, 0)
@@ -305,13 +303,13 @@ app.post('/api/books/:id/favorite', verificarToken, async (req, res) => {
 
             respuestaOK(res, { favorite: false }, "Removido de favoritos");
         } else {
-            // Agregar a favoritos
+            // Add to favorites
             await pool.query(
                 "INSERT INTO users_books (user_id, book_id, status) VALUES (?, ?, 'favoritos') ON DUPLICATE KEY UPDATE status = 'favoritos'",
                 [userId, bookId]
             );
 
-            // Aumentar contador
+            // Increase counter
             await pool.query(`
                 INSERT INTO book_metrics (book_id, favorites) VALUES (?, 1)
                 ON DUPLICATE KEY UPDATE favorites = favorites + 1
@@ -325,7 +323,7 @@ app.post('/api/books/:id/favorite', verificarToken, async (req, res) => {
     }
 });
 
-// 📚 GET /api/user/favorites - Obtener libros favoritos del usuario
+// 📚 GET /api/user/favorites - Get the user's favorite books
 app.get('/api/user/favorites', verificarToken, async (req, res) => {
     try {
         const userId = req.user.user_id;
@@ -351,7 +349,7 @@ app.get('/api/user/favorites', verificarToken, async (req, res) => {
     }
 });
 
-// 📊 GET /api/user/profile - Obtener perfil del usuario
+// 📊 GET /api/user/profile - Get the user's profile
 app.get('/api/user/profile', verificarToken, async (req, res) => {
     try {
         const userId = req.user.user_id;
@@ -371,7 +369,7 @@ app.get('/api/user/profile', verificarToken, async (req, res) => {
             WHERE u.user_id = ?
         `, [userId]);
 
-        // Contar estadísticas del usuario
+        // Count user statistics
         const [[stats]] = await pool.query(`
             SELECT 
                 COUNT(CASE WHEN ub.status = 'favoritos' THEN 1 END) as total_favoritos,
@@ -392,12 +390,11 @@ app.get('/api/user/profile', verificarToken, async (req, res) => {
     }
 });
 
-// ==================== ESTADÍSTICAS GENERALES ====================
-
-// 📊 GET /api/stats - Estadísticas generales de la plataforma
+// ==================== GENERAL STATISTICS ====================
+// 📊 GET /api/stats - General platform statistics
 app.get('/api/stats', async (req, res) => {
     try {
-        // Estadísticas básicas
+        // Basic statistics
         const [[stats]] = await pool.query(`
             SELECT 
                 (SELECT COUNT(*) FROM books) as total_libros,
@@ -406,7 +403,7 @@ app.get('/api/stats', async (req, res) => {
                 (SELECT COUNT(*) FROM books WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)) as libros_recientes
         `);
 
-        // Top 5 libros más populares
+        // Top 5 most popular books
         const [librosPopulares] = await pool.query(`
             SELECT 
                 b.book_id,
@@ -422,7 +419,7 @@ app.get('/api/stats', async (req, res) => {
             LIMIT 5
         `);
 
-        // Géneros más populares
+        // Most popular genres
         const [generosPopulares] = await pool.query(`
             SELECT 
                 g.genre_name,
@@ -445,9 +442,9 @@ app.get('/api/stats', async (req, res) => {
     }
 });
 
-// ==================== MANEJO DE ERRORES ====================
+// ===================== ERROR HANDLING ====================
 
-// Endpoint no encontrado
+// Endpoint not found
 app.use('*', (req, res) => {
     res.status(404).json({
         success: false,
@@ -455,7 +452,7 @@ app.use('*', (req, res) => {
     });
 });
 
-// Error global
+// Global error
 app.use((error, req, res, next) => {
     console.error("❌ Error no manejado:", error);
     res.status(500).json({
@@ -464,13 +461,13 @@ app.use((error, req, res, next) => {
     });
 });
 
-// ==================== INICIAR SERVIDOR ====================
+// ==================== START SERVER ====================
 
-// Iniciar el servidor y la sincronización
+// Start the server and synchronization
 app.listen(PORT, async () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     
-    // Verificar si la base de datos está vacía antes de sincronizar
+    // Check if the database is empty before synchronizing
     try {
         const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
         if (rows[0].count === 0) {

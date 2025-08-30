@@ -1,114 +1,106 @@
-# Backend de OpenLibro
+# OpenLibro Backend
 
-Este repositorio contiene el código fuente del backend para **OpenLibro**, una plataforma de gestión y descubrimiento de libros. La API está construida con Node.js y Express, y se conecta a una base de datos MySQL para la persistencia de datos.
+This repository contains the backend source code for **OpenLibro**, a book discovery and management platform. The API is built with Node.js and Express, and connects to a MySQL database for data persistence.
 
-## 🚀 Características Principales
+## 🚀 Key Features
 
--   **Autenticación de Usuarios**: Sistema de registro e inicio de sesión seguro utilizando JSON Web Tokens (JWT) y hashing de contraseñas con Bcrypt.
--   **Gestión de Libros**: API para buscar, filtrar y obtener detalles de libros.
--   **Sincronización con OpenLibrary**: Un script que puebla la base de datos con información de libros y géneros desde la API de OpenLibrary.
--   **Interacciones de Usuario**: Los usuarios autenticados pueden marcar libros como `favoritos` y darles `like`.
--   **Perfiles y Estadísticas**: Endpoints para que los usuarios vean su perfil y para obtener estadísticas generales de la plataforma (libros más populares, total de usuarios, etc.).
--   **Servidor de Archivos Estáticos**: El backend también sirve el frontend de la aplicación.
+- **User Authentication**: Secure registration and login system using JSON Web Tokens (JWT) and password hashing with Bcrypt.
+- **Book Management**: API for searching, filtering, and retrieving book details.
+- **OpenLibrary Sync**: A script that populates the database with book and genre information from the OpenLibrary API.
+- **User Interactions**: Authenticated users can mark books as favorites and like them.
 
-## 🛠️ Tecnologías Utilizadas
+- **Profiles and Statistics**: Endpoints for users to view their profile and to obtain general platform statistics (most popular books, total users, etc.).
+- **Static File Server**: The backend also serves the application's frontend.
 
--   **Backend**: Node.js, Express.js
--   **Base de Datos**: MySQL
--   **Autenticación**: JSON Web Tokens (`jsonwebtoken`)
--   **Seguridad**: `bcrypt` para hashing de contraseñas
--   **Gestión de Entorno**: `dotenv`
--   **Cliente HTTP**: `axios` para consumir APIs externas
--   **CORS**: `cors` para habilitar peticiones desde otros orígenes
+## 🛠️ Technologies Used
 
-## 🗄️ Base de Datos
+- **Backend**: Node.js, Express.js
+- **Database**: MySQL
+- **Authentication**: JSON Web Tokens (`jsonwebtoken`)
+- **Security**: `bcrypt` for password hashing
+- **Environment Management**: `dotenv`
+- **HTTP Client**: `axios` to consume external APIs
+- **CORS**: `cors` to enable requests from other sources
 
-El esquema completo de la base de datos se encuentra en el archivo `public/script.sql`. Este script creará todas las tablas, relaciones y datos iniciales necesarios.
+## 🗄️ Database
 
-**Tablas principales**: `users`, `roles`, `books`, `genres`, `institutions`.
-**Tablas de relaciones e interacciones**: `books_genres`, `book_metrics`, `users_books`, `books_reactions`.
+The complete database schema is located in the `public/script.sql` file. This script will create all the necessary tables, relationships, and initial data.
 
-## ⚙️ Guía de Instalación y Puesta en Marcha
+**Main tables**: `users`, `roles`, `books`, `genres`, `institutions`.
+**Relationship and interaction tables**: `books_genres`, `book_metrics`, `users_books`, `books_reactions`.
 
-Sigue estos pasos para levantar el proyecto en tu entorno local.
+## ⚙️ Installation and Startup Guide
 
-### Prerrequisitos
+Follow these steps to deploy the project in your local environment.
 
--   Node.js (v18 o superior)
--   NPM
--   Un servidor de MySQL en funcionamiento
+### Prerequisites
 
-### Pasos
+- Node.js (v18 or higher)
+- NPM
+- A working MySQL server
 
-1.  **Clonar el repositorio:**
-    ```bash
-    git clone <URL_DEL_REPOSITORIO>
-    cd <NOMBRE_DEL_DIRECTORIO>
-    ```
+### Steps
 
-2.  **Instalar dependencias:**
-    ```bash
-    npm install
-    ```
+1. Clone the repository:
 
-3.  **Configurar la base de datos:**
-    -   Abre tu cliente de MySQL.
-    -   Ejecuta el script `public/script.sql` para crear la base de datos `openbook` y todas sus tablas.
-    ```sql
-    -- Ejemplo usando el cliente de línea de comandos de mysql
-    mysql -u tu_usuario -p < public/script.sql
-    ```
+```bash
+git clone <REPOSITORY_URL>
+cd <DIRECTORY_NAME>
+```
 
-4.  **Configurar las variables de entorno:**
-    -   Crea una copia del archivo `.env.example` que he creado en la raíz del proyecto y renómbrala a `.env`.
-    ```bash
-    cp .env.example .env
-    ```
-    -   Abre el archivo `.env` y rellena los valores correspondientes, especialmente los de la base de datos (`DB_USER`, `DB_PASSWORD`) y el `JWT_SECRET`.
+2. Install dependencies:
+```bash
+npm install
+```
 
-5.  **Iniciar el servidor:**
-    ```bash
-    npm start
-    ```
-    El servidor debería estar corriendo en `http://localhost:3000` (o el puerto que hayas configurado en tu archivo `.env`).
+3. Configure the database:
 
-## 📡 Endpoints de la API
+- Open your MySQL client.
+- Run the `public/script.sql` script to create the `openbook` database and all its tables.
 
-Aquí hay un resumen de los endpoints más importantes.
+```sql
+-- Example using the mysql command line client
+mysql -u your_username -p < public/script.sql
+```
 
-| Verbo  | Ruta                        | Descripción                                     | Autenticación |
+4. **Configure the environment variables:**
+- Create a copy of the `.env.example` file I created in the project root and rename it to `.env`.
+```bash
+cp .env.example .env
+```
+- Open the `.env` file and fill in the corresponding values, especially those for the database (`DB_USER`, `DB_PASSWORD`) and the `JWT_SECRET`.
+
+5. **Start the server:**
+```bash
+npm start
+```
+The server should be running on `http://localhost:3000` (or whatever port you configured in your `.env` file).
+
+## 📡 API Endpoints
+
+Here's a summary of the most important endpoints.
+
+| Verb | Path | Description | Authentication |
 | :----- | :-------------------------- | :---------------------------------------------- | :------------ |
-| `GET`  | `/api/books`                | Obtiene una lista de libros. Acepta filtros.    | No            |
-| `GET`  | `/api/books/:id`            | Obtiene los detalles de un libro específico.    | No            |
-| `GET`  | `/api/genres`               | Obtiene la lista de todos los géneros.          | No            |
-| `GET`  | `/api/stats`                | Obtiene estadísticas generales de la plataforma.| No            |
-| `POST` | `/api/auth/register`        | Registra un nuevo usuario.                      | No            |
-| `POST` | `/api/auth/login`           | Inicia sesión y devuelve un JWT.                | No            |
-| `GET`  | `/api/user/profile`         | Obtiene el perfil del usuario autenticado.      | **Sí**        |
-| `POST` | `/api/books/:id/like`       | Da/quita un "like" a un libro.                  | **Sí**        |
-| `POST` | `/api/books/:id/favorite`   | Añade/quita un libro de favoritos.              | **Sí**        |
-| `GET`  | `/api/user/favorites`       | Obtiene la lista de libros favoritos del usuario.| **Sí**        |
+| `GET` | `/api/books` | Gets a list of books. Accepts filters. | No |
+| `GET` | `/api/books/:id` | Gets details about a specific book. | No |
+| `GET` | `/api/genres` | Gets a list of all genres. | No |
+| `GET` | `/api/stats` | Gets general platform statistics. | No |
+| `POST` | `/api/auth/register` | Registers a new user. | No |
+| `POST` | `/api/auth/login` | Logs in and returns a JWT. | No |
+| `GET` | `/api/user/profile` | Gets the authenticated user's profile. | **Yes** |
+| `POST` | `/api/books/:id/like` | Likes/unlikes a book. | **Yes** |
+| `POST` | `/api/books/:id/favorite` | Adds/removes a book from favorites. | **Yes** |
+| `GET` | `/api/user/favorites` | Gets the user's list of favorite books. | **Yes** |
 
-## 🚧 Sugerencias y Próximos Pasos
+## 🚧 Suggestions and Next Steps
 
-Este es un backend funcional, pero aquí hay algunas áreas clave para mejorarlo y hacerlo más robusto y escalable:
+This is a working backend, but here are some key areas to improve it and make it more robust and scalable:
 
--   **🧪 Implementar Pruebas (Testing)**:
-    -   **Pruebas Unitarias**: Para la lógica de negocio en los servicios (ej. `auth.js`).
-    -   **Pruebas de Integración**: Para los endpoints de la API, verificando que las rutas, middlewares y controladores funcionan juntos correctamente.
-    -   *Herramientas sugeridas: Jest, Supertest.*
+- **🧪 Implement Testing**:
+- **Unit Tests**: For business logic in services (e.g., `auth.js`).
+- **Integration Testing**: For API endpoints, verifying that routes, middleware, and controllers work together correctly.
+- *Suggested tools: Jest, Supertest.*
 
--   **📄 Documentación de la API**:
-    -   Generar documentación interactiva y formal de la API para facilitar su consumo.
-    -   *Herramientas sugeridas: Swagger, OpenAPI, Postman.*
-
--   **🛡️ Validación de Entradas (Input Validation)**:
-    -   Añadir una capa de validación para los datos que llegan en `req.body`, `req.params` y `req.query` para prevenir datos maliciosos o malformados.
-    -   *Librerías sugeridas: `joi`, `express-validator`.*
-
--   **🐳 Contenerización**:
-    -   Crear un `Dockerfile` y un `docker-compose.yml` para facilitar el despliegue y la configuración del entorno de desarrollo, encapsulando la aplicación y la base de datos.
-
--   **🔄 Pipeline de CI/CD**:
-    -   Configurar un flujo de trabajo de Integración Continua y Despliegue Continuo para automatizar las pruebas y los despliegues.
-    -   *Plataformas sugeridas: GitHub Actions, GitLab CI.*
+- **📄 API Documentation**:
+- Generate docs

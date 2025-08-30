@@ -1,9 +1,9 @@
 // utils.js
 
 /**
- * Pausa la ejecución por la cantidad de milisegundos indicada.
- * Sirve para evitar saturar la API de Open Library con muchas peticiones.
- * @param {number} ms - Milisegundos a esperar
+ * Pauses execution for the specified number of milliseconds.
+* This is used to avoid overloading the Open Library API with multiple requests.
+ * @param {number} ms - Milliseconds to wait
  * @returns {Promise<void>}
  */
 export function sleep(ms) {

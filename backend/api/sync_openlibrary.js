@@ -1,17 +1,17 @@
-// Cargar variables de entorno
+// load environment variables
 import "dotenv/config";
 
-// Librerías que necesitamos
+// libraries we need
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { pool } from "../database/conexion_db.js";
 import { sleep } from "../utils/utils.js";
 
-// Variables que usaremos en todo el código
+// variables that we will use throughout the code
 const BOOKS_API_URL = process.env.BOOKS_API_URL;
 const GENRES = process.env.GENRES.split(",").map((g) => g.trim());
 
-// Configurar axios para que reintente cuando falle
+// Configure Axios to retry on failure
 axiosRetry(axios, {
     retries: 3,
     retryDelay: axiosRetry.exponentialDelay,
@@ -24,16 +24,16 @@ axiosRetry(axios, {
     },
 });
 
-// Función para crear una descripción del libro
+// Function to create a book description
 function crearDescripcion(titulo, autor, año) {
     const autorFinal = autor || "Autor desconocido";
     const añoFinal = año || "un año no especificado";
     return `"${titulo}" es una obra escrita por ${autorFinal}, publicada por primera vez en ${añoFinal}.`;
 }
 
-// Función para verificar si un libro es válido
+// Function to check if a book is valid
 function esLibroValido(libro) {
-    // El libro debe tener estos datos obligatorios
+    // The book must have these mandatory data
     if (!libro) return false;
     if (!libro.key) return false;
     if (!libro.title || libro.title.trim() === "") return false;
@@ -42,26 +42,26 @@ function esLibroValido(libro) {
     return true;
 }
 
-// Función para limpiar los datos de un libro
+// Function to clean the data of a workbook
 function limpiarDatosLibro(libroSucio) {
-    // Si el libro no es válido, devolver null
+    // If the book is not valid, return null
     if (!esLibroValido(libroSucio)) {
         return null;
     }
 
-    // Extraer y limpiar los datos
+    // Extract and clean the data
     const titulo = libroSucio.title.trim();
     const autor = libroSucio.authors[0].name?.trim() || "Desconocido";
     const año = libroSucio.first_publish_year || null;
     const coverId = libroSucio.cover_id || null;
     
-    // Solo crear URL de portada si existe el ID
+    // Only create cover URL if the ID exists
     let urlPortada = null;
     if (coverId) {
         urlPortada = `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
     }
 
-    // Devolver datos limpios
+    // Return clean data
     return {
         clave: libroSucio.key,
         titulo: titulo,
@@ -72,16 +72,16 @@ function limpiarDatosLibro(libroSucio) {
     };
 }
 
-// Función para guardar un género en la base de datos
+// Function to save a genre in the database
 async function guardarGenero(conexion, nombreGenero) {
-    // Insertar o actualizar el género
+    // Insert or update gender
     await conexion.query(
         `INSERT INTO genres (genre_name) VALUES (?)
         ON DUPLICATE KEY UPDATE genre_name = VALUES(genre_name)`,
         [nombreGenero]
     );
 
-    // Obtener el ID del género
+    // Get the genre ID
     const [[resultado]] = await conexion.query(
         "SELECT genre_id FROM genres WHERE genre_name = ?",
         [nombreGenero]
@@ -90,11 +90,11 @@ async function guardarGenero(conexion, nombreGenero) {
     return resultado.genre_id;
 }
 
-// Función para guardar un libro en la base de datos
+// Function to save a book in the database
 async function guardarLibro(conexion, datosLibro) {
     const { clave, titulo, autor, descripcion, urlPortada, año } = datosLibro;
     
-    // Insertar o actualizar el libro
+    // Insert or update the workbook
     await conexion.query(
         `INSERT INTO books (google_id, title, author, description, cover_url, published_year, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())
@@ -108,7 +108,7 @@ async function guardarLibro(conexion, datosLibro) {
         [clave, titulo, autor, descripcion, urlPortada, año]
     );
 
-    // Obtener el ID del libro
+    // Get the book ID
     const [[resultado]] = await conexion.query(
         "SELECT book_id FROM books WHERE google_id = ?",
         [clave]
@@ -117,7 +117,7 @@ async function guardarLibro(conexion, datosLibro) {
     return resultado.book_id;
 }
 
-// Función para conectar un libro con un género
+// Function to connect a book with a genre
 async function conectarLibroConGenero(conexion, idLibro, idGenero) {
     await conexion.query(
         "INSERT IGNORE INTO books_genres (book_id, genre_id) VALUES (?, ?)",
@@ -125,18 +125,18 @@ async function conectarLibroConGenero(conexion, idLibro, idGenero) {
     );
 }
 
-// Función principal para obtener libros de la API
+// Main function to get books from the API
 async function obtenerLibrosDeAPI(genero, cantidad = 20, desde = 0) {
     console.log(`📚 Obteniendo libros de "${genero}" - cantidad: ${cantidad}, desde: ${desde}`);
 
-    // Crear la URL para la API
+    // Create the URL for the API
     const url = `${BOOKS_API_URL}/subjects/${encodeURIComponent(genero)}.json?limit=${cantidad}&offset=${desde}`;
     
-    // Obtener conexión a la base de datos
+    // Get connection to the database
     const conexion = await pool.getConnection();
 
     try {
-        // Hacer petición a la API
+        // Make a request to the API
         console.log(`🌐 Consultando API: ${genero}`);
         const respuesta = await axios.get(url, { timeout: 60000 });
         const librosSucios = respuesta.data?.works || [];
@@ -146,39 +146,39 @@ async function obtenerLibrosDeAPI(genero, cantidad = 20, desde = 0) {
             return 0;
         }
 
-        // Empezar transacción de base de datos
+        // Start database transaction
         await conexion.beginTransaction();
 
-        // Guardar el género primero
+        // Save the genre first
         const idGenero = await guardarGenero(conexion, genero);
 
         let librosGuardados = 0;
         let librosOmitidos = 0;
 
-        // Procesar cada libro uno por uno
+        // Process each book one by one
         for (let i = 0; i < librosSucios.length; i++) {
             const libroSucio = librosSucios[i];
             
             try {
-                // Limpiar los datos del libro
+                // Clear workbook data
                 const libroLimpio = limpiarDatosLibro(libroSucio);
                 
-                // Si el libro no es válido, saltarlo
+                // If the book is not valid, skip it.
                 if (!libroLimpio) {
                     librosOmitidos++;
                     console.log(`⚠️ Libro omitido: ${libroSucio?.title || 'Sin título'} (datos incompletos)`);
                     continue;
                 }
 
-                // Guardar el libro en la base de datos
+                // Save the book to the database
                 const idLibro = await guardarLibro(conexion, libroLimpio);
                 
-                // Conectar el libro con el género
+                // Connecting the book with the genre
                 await conectarLibroConGenero(conexion, idLibro, idGenero);
                 
                 librosGuardados++;
                 
-                // Pausa pequeña cada 5 libros para no saturar la BD
+                // Take a short break every 5 books to avoid overloading the database.
                 if (librosGuardados % 5 === 0) {
                     await sleep(200);
                 }
@@ -186,44 +186,44 @@ async function obtenerLibrosDeAPI(genero, cantidad = 20, desde = 0) {
             } catch (errorLibro) {
                 librosOmitidos++;
                 console.log(`❌ Error con libro "${libroSucio?.title || 'Sin título'}": ${errorLibro.message}`);
-                // Continuar con el siguiente libro
+                // Continue with the next book
                 continue;
             }
         }
 
-        // Confirmar todos los cambios
+        // Confirm all changes
         await conexion.commit();
         
         console.log(`✅ "${genero}" completado: ${librosGuardados} guardados, ${librosOmitidos} omitidos`);
         return librosGuardados;
         
     } catch (error) {
-        // Si algo falla, deshacer todos los cambios
+        // If something goes wrong, undo all changes
         await conexion.rollback();
         console.log(`❌ Error con género "${genero}": ${error.message}`);
         throw error;
     } finally {
-        // Siempre liberar la conexión
+        // Always release the connection
         conexion.release();
     }
 }
 
-// Función para obtener todos los libros de un género (con paginación)
+// Function to get all books of a genre (with pagination)
 async function obtenerTodosLosLibros(genero, totalDeseado = 100) {
     console.log(`🎯 Empezando a sincronizar género: "${genero}" (meta: ${totalDeseado} libros)`);
     
-    let desde = 0; // Desde qué libro empezar
-    let totalProcesados = 0; // Cuántos libros hemos procesado
-    let erroresConsecutivos = 0; // Cuántos errores seguidos hemos tenido
-    let respuestasVacias = 0; // Cuántas veces no encontramos libros
+    let desde = 0; // Which book to start from
+    let totalProcesados = 0; // How many books have we processed?
+    let erroresConsecutivos = 0; // How many mistakes in a row have we had?
+    let respuestasVacias = 0; // How many times do we not find books?
     
-    // Seguir hasta que tengamos suficientes libros o muchos errores
+    // Continue until we have enough books or many errors.
     while (totalProcesados < totalDeseado && erroresConsecutivos < 3) {
         try {
-            // Obtener un lote de libros
+            // Get a batch of books
             const librosProcesados = await obtenerLibrosDeAPI(genero, 20, desde);
             
-            // Si no encontramos libros, tal vez ya no hay más
+            // If we don't find books, maybe there are no more.
             if (librosProcesados === 0) {
                 respuestasVacias++;
                 if (respuestasVacias >= 3) {
@@ -231,15 +231,15 @@ async function obtenerTodosLosLibros(genero, totalDeseado = 100) {
                     break;
                 }
             } else {
-                respuestasVacias = 0; // Resetear contador si encontramos libros
+                respuestasVacias = 0; // Reset counter if we find books
             }
             
-            // Actualizar nuestros contadores
+            // Update our counters
             totalProcesados += librosProcesados;
-            desde += 20; // Para la siguiente página
-            erroresConsecutivos = 0; // Resetear errores porque funcionó
+            desde += 20; // For the next page
+            erroresConsecutivos = 0; // Reset errors because it worked
             
-            // Pausa para no saturar la API
+            // Pause to avoid saturating the API
             await sleep(1000);
             
             console.log(`📈 Progreso "${genero}": ${totalProcesados}/${totalDeseado} libros`);
@@ -248,7 +248,7 @@ async function obtenerTodosLosLibros(genero, totalDeseado = 100) {
             erroresConsecutivos++;
             console.log(`❌ Error en lote "${genero}" (intento ${erroresConsecutivos}/3): ${error.message}`);
             
-            // Pausa más larga cuando hay error
+            // Longer pause when there is an error
             await sleep(3000);
         }
     }
@@ -262,34 +262,34 @@ async function obtenerTodosLosLibros(genero, totalDeseado = 100) {
     return totalProcesados;
 }
 
-// Función principal para procesar todos los géneros
+// Main function to process all genres
 async function sincronizarTodosLosGeneros() {
     console.log(`🚀 Empezando sincronización de ${GENRES.length} géneros`);
     
     const tiempoInicio = Date.now();
     let totalLibrosProcesados = 0;
     
-    // Procesar géneros de a 2 para no saturar la API
+    // Process genres in batches to avoid overloading the API
     for (let i = 0; i < GENRES.length; i += 2) {
-        // Tomar hasta 2 géneros
+        // Take up to 2 genres
         const loteGeneros = GENRES.slice(i, i + 2);
         console.log(`\n🔄 Procesando lote: [${loteGeneros.join(", ")}]`);
         
         try {
-            // Procesar estos géneros al mismo tiempo
+            // Process these genres at the same time
             const promesas = loteGeneros.map(genero => 
                 obtenerTodosLosLibros(genero, 100)
             );
             
             const resultados = await Promise.all(promesas);
             
-            // Sumar cuántos libros procesamos en este lote
+            // Add up how many books we processed in this batch
             const librosDeLote = resultados.reduce((suma, cantidad) => suma + cantidad, 0);
             totalLibrosProcesados += librosDeLote;
             
             console.log(`✅ Lote completado: ${librosDeLote} libros`);
             
-            // Pausa entre lotes para no saturar la API
+            // Pause between batches to avoid saturating the API
             if (i + 2 < GENRES.length) {
                 console.log(`⏳ Esperando antes del siguiente lote...`);
                 await sleep(3000);
@@ -300,7 +300,7 @@ async function sincronizarTodosLosGeneros() {
         }
     }
     
-    // Mostrar estadísticas finales
+    // Show final statistics
     const tiempoTotal = Math.round((Date.now() - tiempoInicio) / 1000);
     console.log(`\n🎉 ¡SINCRONIZACIÓN COMPLETADA!`);
     console.log(`📊 Total de libros procesados: ${totalLibrosProcesados}`);
@@ -308,5 +308,5 @@ async function sincronizarTodosLosGeneros() {
     console.log(`📈 Velocidad promedio: ${(totalLibrosProcesados / tiempoTotal).toFixed(1)} libros por segundo`);
 }
 
-// Exportar la función principal para poder llamarla desde otros archivos
+// Export the main function so that it can be called from other files
 export { sincronizarTodosLosGeneros };

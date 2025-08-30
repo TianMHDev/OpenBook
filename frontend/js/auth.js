@@ -1,9 +1,9 @@
 
 
-// URL base de la API - cambiar según el entorno
+// API Base URL - change depending on the environment
 const API_BASE_URL = 'http://localhost:3000/api/auth';
 
-// Configuración de roles y sus dominios correspondientes
+// Configuring roles and their corresponding domains
 const ROLE_CONFIG = {
     teacher: {
         id: 1,
@@ -20,26 +20,26 @@ const ROLE_CONFIG = {
 };
 
 // =====================================================================
-// FUNCIONES DE AUTENTICACIÓN PRINCIPALES
+// MAIN AUTHENTICATION FUNCTIONS
 // =====================================================================
 
 /**
- * Maneja el proceso de inicio de sesión
- * @param {Event} event - Evento del formulario
+ * Handles the login process
+ * @param {Event} event - Form event
  */
 async function handleLogin(event) {
     event.preventDefault();
 
-    // Obtener elementos del formulario
+    // Get form elements
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const errorEmailElement = document.getElementById('login-email-error');
     const errorPasswordElement = document.getElementById('login-password-error');
 
-    // Limpiar mensajes de error previos
+    // Clear previous error messages
     clearErrorMessages([errorEmailElement, errorPasswordElement]);
 
-    // Validación básica en el cliente (solo para UX)
+    // Basic client-side validation (UX only)
     if (!email) {
         showFieldError(errorEmailElement, 'El correo es requerido');
         return;
@@ -49,34 +49,34 @@ async function handleLogin(event) {
         return;
     }
 
-    // Mostrar indicador de carga
+    // Show charging indicator
     showLoadingState('Iniciando sesión...');
 
     try {
-        // Realizar petición al backend
+        // Make a request to the backend
         const response = await fetch(`${API_BASE_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ 
-                email: email.toLowerCase(), // Normalizar email
+                email: email.toLowerCase(), // Normalize email
                 password 
             })
         });
 
         const data = await response.json();
 
-        // Manejar diferentes tipos de respuesta del servidor
+        // Handling different types of server responses
         if (!response.ok) {
             handleLoginError(response.status, data, errorEmailElement, errorPasswordElement);
             return;
         }
 
-        // Login exitoso - guardar datos del usuario
+        // Login successful - save user data
         saveUserSession(data);
         
-        // Redireccionar según el rol del usuario
+        // Redirect based on user role
         redirectUserBasedOnRole(data.user.role_id);
 
     } catch (error) {
@@ -88,27 +88,27 @@ async function handleLogin(event) {
 }
 
 /**
- * Maneja el proceso de registro de usuarios
- * @param {Event} event - Evento del formulario
+ * Manages the user registration process
+ * @param {Event} event - Form event
  */
 async function handleRegister(event) {
     event.preventDefault();
 
-    // Recopilar datos del formulario
+    // Collect form data
     const formData = collectFormData();
     
-    // Validar datos básicos en el cliente (solo UX)
+    // Validate basic data on the client (UX only)
     const clientValidation = validateFormDataClient(formData);
     if (!clientValidation.isValid) {
         showValidationErrors(clientValidation.errors);
         return;
     }
 
-    // Mostrar estado de carga
+    // Show charging status
     showLoadingState('Registrando usuario...');
 
     try {
-        // Enviar datos al backend para validación y registro real
+        // Send data to the backend for validation and actual registration
         const response = await fetch(`${API_BASE_URL}/register`, {
             method: 'POST',
             headers: {
@@ -132,11 +132,11 @@ async function handleRegister(event) {
             return;
         }
 
-        // Registro exitoso
+        // Successful registration
         showSuccessMessage('¡Registro exitoso! Puedes iniciar sesión ahora.');
         resetRegistrationForm();
         
-        // Opcional: redirigir automáticamente al login
+        // Optional: Automatically redirect to login
         setTimeout(() => {
             window.location.href = '../views/login.html';
         }, 2000);
@@ -150,15 +150,15 @@ async function handleRegister(event) {
 }
 
 // =====================================================================
-// FUNCIONES DE VALIDACIÓN DEL CLIENTE (SOLO PARA UX)
+// CUSTOMER VALIDATION FUNCTIONS (FOR UX ONLY)
 // =====================================================================
 
 /**
- * Valida el formato del email según el rol (validación de UX)
- * NOTA: Esta es solo validación de UX. La validación real está en el backend.
- * @param {string} email - Correo electrónico
- * @param {string} role - Rol del usuario (teacher/student)
- * @returns {boolean} - Es válido el formato
+ * Validates email format based on role (UX validation)
+* NOTE: This is only UX validation. The actual validation is in the backend.
+ * @param {string} email - email
+ * @param {string} role - User role (teacher/student)
+ * @returns {boolean} - The format is valid
  */
 function validateEmailFormatUX(email, role) {
     if (!email || !role || !ROLE_CONFIG[role]) return false;
@@ -171,27 +171,27 @@ function validateEmailFormatUX(email, role) {
 }
 
 /**
- * Valida los datos del formulario en el cliente (solo para UX)
+ * Validates form data on the client (UX only)
  * @param {Object} formData - Datos del formulario
- * @returns {Object} - Resultado de la validación
+ * @returns {Object} - Validation result
  */
 function validateFormDataClient(formData) {
     const errors = {};
     let isValid = true;
 
-    // Validar nombre completo
+    // Validate full name
     if (!formData.fullName || formData.fullName.length < 3) {
         errors.fullName = 'El nombre debe tener al menos 3 caracteres';
         isValid = false;
     }
 
-    // Validar número de identificación (formato básico)
+    // Validate ID number (basic format)
     if (!formData.nationalId || !/^\d{7,12}$/.test(formData.nationalId)) {
         errors.nationalId = 'Número de identificación inválido (7-12 dígitos)';
         isValid = false;
     }
 
-    // Validar email
+    // Validate email
     if (!formData.email) {
         errors.email = 'El correo electrónico es requerido';
         isValid = false;
@@ -201,7 +201,7 @@ function validateFormDataClient(formData) {
         isValid = false;
     }
 
-    // Validar contraseña (reglas básicas)
+    // Validate password (basic rules)
     if (!formData.password) {
         errors.password = 'La contraseña es requerida';
         isValid = false;
@@ -210,7 +210,7 @@ function validateFormDataClient(formData) {
         isValid = false;
     }
 
-    // Validar rol
+    // Validate role
     if (!formData.role || !ROLE_CONFIG[formData.role]) {
         errors.role = 'Debe seleccionar un tipo de usuario válido';
         isValid = false;
@@ -220,11 +220,11 @@ function validateFormDataClient(formData) {
 }
 
 // =====================================================================
-// FUNCIONES DE VALIDACIÓN EN TIEMPO REAL
+// REAL-TIME VALIDATION FUNCTIONS
 // =====================================================================
 
 /**
- * Configura la validación en tiempo real del email
+ * Configure real-time email validation
  */
 function setupRealTimeEmailValidation() {
     const emailInput = document.getElementById('email');
@@ -233,7 +233,7 @@ function setupRealTimeEmailValidation() {
 
     if (!emailInput || !emailError) return;
 
-    // Función para validar email cuando cambia
+    // Function to validate email when it changes
     function validateEmailRealTime() {
         const emailValue = emailInput.value.trim();
         const selectedRole = document.querySelector('input[name="userType"]:checked')?.value;
@@ -249,7 +249,7 @@ function setupRealTimeEmailValidation() {
         }
         
 
-        // Validar formato
+        // Validate format
         if (validateEmailFormatUX(emailValue, selectedRole)) {
             showFieldSuccess(emailError, '✓ Correo válido');
         } else {
@@ -258,29 +258,29 @@ function setupRealTimeEmailValidation() {
         }
     }
 
-    // Actualizar placeholder cuando cambia el rol
+    // Update placeholder when role changes
     function updateEmailPlaceholder(role) {
         if (ROLE_CONFIG[role]) {
             emailInput.placeholder = ROLE_CONFIG[role].placeholder;
-            emailInput.value = ''; // Limpiar campo al cambiar rol
+            emailInput.value = ''; // Clear field when changing role
             clearFieldError(emailError);
         }
     }
 
-    // Listeners para cambios de rol
+    // Listeners for role changes
     roleInputs.forEach(radio => {
         radio.addEventListener('change', () => {
             updateEmailPlaceholder(radio.value);
-            validateEmailRealTime(); // Revalidar si ya hay texto
+            validateEmailRealTime(); // Revalidate if there is already text
         });
     });
 
-    // Listeners para cambios en el email
+    // Listeners for email changes
     emailInput.addEventListener('input', validateEmailRealTime);
     emailInput.addEventListener('blur', validateEmailRealTime);
 }
 // =====================================================================
-// FUNCIONES DE VALIDACIÓN EN TIEMPO REAL
+// REAL-TIME VALIDATION FUNCTIONS
 // =====================================================================
 
 
@@ -296,35 +296,35 @@ function setupRealTimePasswordValidation() {
         const errors = [];
         let strength = 0;
 
-        // Verificar longitud mínima
+        // Check minimum length
         if (password.length >= 8) {
             strength++;
         } else {
             errors.push("Debe tener al menos 8 caracteres");
         }
 
-        // Verificar mayúsculas
+        // Check upercase
         if (/[A-Z]/.test(password)) {
             strength++;
         } else {
             errors.push("Debe incluir al menos una mayúscula");
         }
 
-        // Verificar minúsculas
+        // Check lowercase
         if (/[a-z]/.test(password)) {
             strength++;
         } else {
             errors.push("Debe incluir al menos una minúscula");
         }
 
-        // Verificar números
+        // Check numbers
         if (/\d/.test(password)) {
             strength++;
         } else {
             errors.push("Debe incluir al menos un número");
         }
 
-        // Mostrar errores
+        // Show errors
         if (errors.length > 0) {
             passwordError.innerHTML = errors.map(err => `${err}`).join("<br>");
             passwordError.style.color = "red";
@@ -333,7 +333,7 @@ function setupRealTimePasswordValidation() {
             passwordError.style.color = "green";
         }
 
-        // Barra de fuerza
+        // Strength bar
         strengthBar.style.width = (strength / 5 * 100) + "%";
         if (strength <= 2) {
             strengthBar.style.background = "red";
@@ -348,12 +348,12 @@ function setupRealTimePasswordValidation() {
 }
 
 // =====================================================================
-// FUNCIONES DE UTILIDAD
+// UTILITY FUNCTIONS
 // =====================================================================
 
 /**
- * Recopila los datos del formulario de registro
- * @returns {Object} - Datos del formulario
+ * Collects data from the registration form
+ * @returns {Object} - Form data
  */
 function collectFormData() {
     const institutionSelect = document.getElementById('institution');
@@ -373,8 +373,8 @@ function collectFormData() {
 
 
 /**
- * Guarda la sesión del usuario en el almacenamiento local
- * @param {Object} sessionData - Datos de la sesión
+ * Saves the user's session to local storage
+ * @param {Object} sessionData - Session data
  */
 function saveUserSession(sessionData) {
     localStorage.setItem('token', sessionData.token);
@@ -387,8 +387,8 @@ function saveUserSession(sessionData) {
 }
 
 /**
- * Redirige al usuario basado en su rol
- * @param {number} roleId - ID del rol del usuario
+ * Redirects the user based on their role
+ * @param {number} roleId - User role ID
  */
 function redirectUserBasedOnRole(roleId) {
     if (roleId === 1) {
@@ -401,15 +401,15 @@ function redirectUserBasedOnRole(roleId) {
 }
 
 // =====================================================================
-// FUNCIONES DE MANEJO DE ERRORES
+// ERROR HANDLING FUNCTIONS
 // =====================================================================
 
 /**
- * Maneja errores específicos del login
- * @param {number} status - Código de estado HTTP
- * @param {Object} data - Datos de respuesta del servidor
- * @param {HTMLElement} emailError - Elemento de error de email
- * @param {HTMLElement} passwordError - Elemento de error de contraseña
+ * Handles login-specific errors
+ * @param {number} status - HTTP status code
+ * @param {Object} data - Server response data
+ * @param {HTMLElement} emailError - Email error element
+ * @param {HTMLElement} passwordError - Password error element
  */
 function handleLoginError(status, data, emailError, passwordError) {
     switch (status) {
@@ -430,13 +430,13 @@ function handleLoginError(status, data, emailError, passwordError) {
 }
 
 /**
- * Maneja errores específicos del registro
- * @param {number} status - Código de estado HTTP
- * @param {Object} data - Datos de respuesta del servidor
+ * Handles registry-specific errors
+ * @param {number} status - HTTP status code
+ * @param {Object} data - Server response data
  */
 function handleRegistrationError(status, data) {
-    // Los errores específicos del backend se muestran directamente
-    // ya que el backend valida todo estrictamente
+    // Backend-specific errors are displayed directly
+// since the backend strictly validates everything
     const errorMessages = {
         'EMAIL_EXISTS': 'Este correo ya está registrado',
         'ID_EXISTS': 'Este número de identificación ya está registrado',
@@ -450,7 +450,7 @@ function handleRegistrationError(status, data) {
 }
 
 // =====================================================================
-// FUNCIONES DE INTERFAZ DE USUARIO
+// USER INTERFACE FUNCTIONS
 // =====================================================================
 
 function showFieldError(element, message) {
@@ -481,24 +481,24 @@ function clearErrorMessages(elements) {
 }
 
 function showGlobalError(message) {
-    alert(message); // Reemplazar con un componente de notificación más elegante
+    alert(message); // Replace with a more elegant notification component
 }
 
 function showSuccessMessage(message) {
-    alert(message); // Reemplazar con un componente de notificación más elegante
+    alert(message); // Replace with a more elegant notification component
 }
 
 function showLoadingState(message) {
-    // Implementar indicador de carga visual
+    // Implement visual load indicator
     console.log(message);
 }
 
 function hideLoadingState() {
-    // Ocultar indicador de carga
+    // Hide loading indicator
 }
 
 // =====================================================================
-// FUNCIONES DE GESTIÓN DE SESIÓN
+// SESSION MANAGEMENT FUNCTIONS
 // =====================================================================
 
 function logout() {
@@ -547,24 +547,24 @@ const togglePassword = document.querySelector(".password-toggle");
         const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
         passwordInput.setAttribute("type", type);
 
-        // Cambia el icono entre ojo abierto y ojo tachado
+        // Toggles the icon between open eye and crossed out eye
         toggleIcon.classList.toggle("bi-eye");
         toggleIcon.classList.toggle("bi-eye-slash");
         
-        // Cambia el aria-label para accesibilidad
+        // Change the aria-label for accessibility
         togglePassword.setAttribute("aria-label", 
             type === "password" ? "Mostrar contraseña" : "Ocultar contraseña"
         );
     });
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Configurar formulario de login
+    // Configure login form
     const loginForm = document.getElementById('login-form');
     if (loginForm) {
         loginForm.addEventListener('submit', handleLogin);
     }
 
-    // Configurar formulario de registro
+    // Configure registration form
     const registerForm = document.getElementById('register-form');
     if (registerForm) {
         registerForm.addEventListener('submit', handleRegister);
@@ -572,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setupRealTimePasswordValidation();
     }
 
-    // Configurar toggles de contraseña
+    // Configure password toggles
     setupPasswordToggle('.password-toggle', 'login-password');
     setupPasswordToggle('#register-password-toggle', 'password');
 });
@@ -581,7 +581,7 @@ function resetRegistrationForm() {
     const form = document.getElementById('register-form');
     if (form) {
         form.reset();
-        // Limpiar todos los mensajes de error
+        // Clear all error messages
         const errorElements = form.querySelectorAll('[id$="-error"]');
         errorElements.forEach(element => clearFieldError(element));
     }
