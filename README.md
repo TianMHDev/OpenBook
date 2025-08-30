@@ -1,146 +1,114 @@
-# Backend de OpenBook
+# Backend de OpenLibro
 
-¡Bienvenido al backend de OpenLibro! Este es el motor que da vida a la aplicación, una API RESTful construida con Node.js y Express que gestiona una completa biblioteca de libros, usuarios, interacciones y mucho más.
+Este repositorio contiene el código fuente del backend para **OpenLibro**, una plataforma de gestión y descubrimiento de libros. La API está construida con Node.js y Express, y se conecta a una base de datos MySQL para la persistencia de datos.
 
-## ¿Qué hace este backend?
+## 🚀 Características Principales
 
-El backend de OpenLibro es responsable de:
+-   **Autenticación de Usuarios**: Sistema de registro e inicio de sesión seguro utilizando JSON Web Tokens (JWT) y hashing de contraseñas con Bcrypt.
+-   **Gestión de Libros**: API para buscar, filtrar y obtener detalles de libros.
+-   **Sincronización con OpenLibrary**: Un script que puebla la base de datos con información de libros y géneros desde la API de OpenLibrary.
+-   **Interacciones de Usuario**: Los usuarios autenticados pueden marcar libros como `favoritos` y darles `like`.
+-   **Perfiles y Estadísticas**: Endpoints para que los usuarios vean su perfil y para obtener estadísticas generales de la plataforma (libros más populares, total de usuarios, etc.).
+-   **Servidor de Archivos Estáticos**: El backend también sirve el frontend de la aplicación.
 
--   **Servir datos de libros**: Proporciona endpoints para buscar, filtrar y consultar información detallada de los libros.
--   **Gestionar usuarios y autenticación**: Maneja el registro y login de usuarios a través de JSON Web Tokens (JWT).
--   **Procesar interacciones**: Registra las acciones de los usuarios, como "likes" y la adición de libros a "favoritos".
--   **Sincronizar datos externos**: Incluye un script especializado para poblar la base de datos local a partir de la [Open Library API](https://openlibrary.org/developers/api), asegurando un catálogo de libros rico y variado.
--   **Ofrecer estadísticas**: Calcula y expone métricas clave, como los libros más populares, los géneros con más títulos y estadísticas generales de la plataforma.
+## 🛠️ Tecnologías Utilizadas
 
-## Tecnologías Utilizadas
-
-Este proyecto está construido con un conjunto de tecnologías modernas y robustas de JavaScript:
-
--   **Runtime**: Node.js
--   **Framework del Servidor**: Express.js
+-   **Backend**: Node.js, Express.js
 -   **Base de Datos**: MySQL
--   **Driver de Base de Datos**: `mysql2`
--   **Autenticación**: JSON Web Tokens (`jsonwebtoken`) para sesiones y `bcrypt` para el hashing seguro de contraseñas.
--   **Cliente HTTP**: `axios` y `axios-retry` para realizar peticiones fiables a APIs externas.
--   **Middleware**: `cors` para habilitar peticiones desde otros dominios y `dotenv` para una gestión segura de las variables de entorno.
--   **Módulos**: El proyecto utiliza `ESM` (ECMAScript Modules) para la gestión de módulos (`import`/`export`).
+-   **Autenticación**: JSON Web Tokens (`jsonwebtoken`)
+-   **Seguridad**: `bcrypt` para hashing de contraseñas
+-   **Gestión de Entorno**: `dotenv`
+-   **Cliente HTTP**: `axios` para consumir APIs externas
+-   **CORS**: `cors` para habilitar peticiones desde otros orígenes
 
----
+## 🗄️ Base de Datos
 
-## Guía de Instalación y Puesta en Marcha
+El esquema completo de la base de datos se encuentra en el archivo `public/script.sql`. Este script creará todas las tablas, relaciones y datos iniciales necesarios.
 
-Sigue estos pasos para tener una copia del proyecto funcionando en tu máquina local.
+**Tablas principales**: `users`, `roles`, `books`, `genres`, `institutions`.
+**Tablas de relaciones e interacciones**: `books_genres`, `book_metrics`, `users_books`, `books_reactions`.
 
-### 1. Prerrequisitos
+## ⚙️ Guía de Instalación y Puesta en Marcha
 
-Asegúrate de tener instalado lo siguiente:
-*   [Node.js](https://nodejs.org/) (versión 14 o superior)
-*   [NPM](https://www.npmjs.com/) (normalmente se instala con Node.js)
-*   Un servidor de [MySQL](https://www.mysql.com/) corriendo en tu máquina o en un contenedor Docker.
+Sigue estos pasos para levantar el proyecto en tu entorno local.
 
-### 2. Clonar el Repositorio
+### Prerrequisitos
 
-```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <NOMBRE_DEL_DIRECTORIO>
-```
+-   Node.js (v18 o superior)
+-   NPM
+-   Un servidor de MySQL en funcionamiento
 
-### 3. Instalar Dependencias
+### Pasos
 
-Instala todas las librerías y paquetes necesarios definidos en `package.json`.
+1.  **Clonar el repositorio:**
+    ```bash
+    git clone <URL_DEL_REPOSITORIO>
+    cd <NOMBRE_DEL_DIRECTORIO>
+    ```
 
-```bash
-npm install
-```
+2.  **Instalar dependencias:**
+    ```bash
+    npm install
+    ```
 
-### 4. Configurar la Base de Datos
+3.  **Configurar la base de datos:**
+    -   Abre tu cliente de MySQL.
+    -   Ejecuta el script `public/script.sql` para crear la base de datos `openbook` y todas sus tablas.
+    ```sql
+    -- Ejemplo usando el cliente de línea de comandos de mysql
+    mysql -u tu_usuario -p < public/script.sql
+    ```
 
-El proyecto necesita una base de datos MySQL para funcionar.
-1.  Conéctate a tu servidor MySQL.
-2.  Crea la base de datos con el nombre `openbook`.
-3.  Ejecuta el script `public/script.sql` en tu cliente de MySQL para crear todas las tablas y relaciones necesarias.
+4.  **Configurar las variables de entorno:**
+    -   Crea una copia del archivo `.env.example` que he creado en la raíz del proyecto y renómbrala a `.env`.
+    ```bash
+    cp .env.example .env
+    ```
+    -   Abre el archivo `.env` y rellena los valores correspondientes, especialmente los de la base de datos (`DB_USER`, `DB_PASSWORD`) y el `JWT_SECRET`.
 
-```sql
--- Ejemplo de cómo ejecutar el script desde la línea de comandos
-mysql -u tu_usuario -p openbook < public/script.sql
-```
+5.  **Iniciar el servidor:**
+    ```bash
+    npm start
+    ```
+    El servidor debería estar corriendo en `http://localhost:3000` (o el puerto que hayas configurado en tu archivo `.env`).
 
-### 5. Configurar Variables de Entorno
+## 📡 Endpoints de la API
 
-Crea un archivo llamado `.env` en la raíz del proyecto. Este archivo contendrá las credenciales y configuraciones sensibles. Copia y pega el siguiente contenido, reemplazando los valores con tu configuración local.
+Aquí hay un resumen de los endpoints más importantes.
 
-```env
-# Configuración del Servidor
-PORT=3000
+| Verbo  | Ruta                        | Descripción                                     | Autenticación |
+| :----- | :-------------------------- | :---------------------------------------------- | :------------ |
+| `GET`  | `/api/books`                | Obtiene una lista de libros. Acepta filtros.    | No            |
+| `GET`  | `/api/books/:id`            | Obtiene los detalles de un libro específico.    | No            |
+| `GET`  | `/api/genres`               | Obtiene la lista de todos los géneros.          | No            |
+| `GET`  | `/api/stats`                | Obtiene estadísticas generales de la plataforma.| No            |
+| `POST` | `/api/auth/register`        | Registra un nuevo usuario.                      | No            |
+| `POST` | `/api/auth/login`           | Inicia sesión y devuelve un JWT.                | No            |
+| `GET`  | `/api/user/profile`         | Obtiene el perfil del usuario autenticado.      | **Sí**        |
+| `POST` | `/api/books/:id/like`       | Da/quita un "like" a un libro.                  | **Sí**        |
+| `POST` | `/api/books/:id/favorite`   | Añade/quita un libro de favoritos.              | **Sí**        |
+| `GET`  | `/api/user/favorites`       | Obtiene la lista de libros favoritos del usuario.| **Sí**        |
 
-# Configuración de la Base de Datos
-DB_HOST=localhost
-DB_USER=root
-DB_PASS=tu_contraseña_de_mysql
-DB_NAME=openbook
+## 🚧 Sugerencias y Próximos Pasos
 
-# Secret para JSON Web Token (JWT)
-# Puedes generar una cadena segura aquí: https://www.grc.com/passwords.htm
-JWT_SECRET=tu_clave_secreta_muy_larga_y_segura
+Este es un backend funcional, pero aquí hay algunas áreas clave para mejorarlo y hacerlo más robusto y escalable:
 
-# Configuración del script de sincronización con OpenLibrary
-BOOKS_API_URL=https://openlibrary.org
-GENRES=love, classic, fantasy, science_fiction, thriller, horror, history, biography
-```
+-   **🧪 Implementar Pruebas (Testing)**:
+    -   **Pruebas Unitarias**: Para la lógica de negocio en los servicios (ej. `auth.js`).
+    -   **Pruebas de Integración**: Para los endpoints de la API, verificando que las rutas, middlewares y controladores funcionan juntos correctamente.
+    -   *Herramientas sugeridas: Jest, Supertest.*
 
-### 6. Poblar la Base de Datos (Paso Crucial)
+-   **📄 Documentación de la API**:
+    -   Generar documentación interactiva y formal de la API para facilitar su consumo.
+    -   *Herramientas sugeridas: Swagger, OpenAPI, Postman.*
 
-La base de datos está vacía después de la instalación. Para llenarla con libros, debes ejecutar el script de sincronización. Este script se conectará a la API de OpenLibrary, descargará información sobre libros de los géneros definidos en la variable `GENRES` y los guardará en tu base de datos.
+-   **🛡️ Validación de Entradas (Input Validation)**:
+    -   Añadir una capa de validación para los datos que llegan en `req.body`, `req.params` y `req.query` para prevenir datos maliciosos o malformados.
+    -   *Librerías sugeridas: `joi`, `express-validator`.*
 
-**Nota**: Este proceso puede tardar varios minutos, ya que realiza múltiples peticiones a la API externa con pausas para no saturarla.
+-   **🐳 Contenerización**:
+    -   Crear un `Dockerfile` y un `docker-compose.yml` para facilitar el despliegue y la configuración del entorno de desarrollo, encapsulando la aplicación y la base de datos.
 
-```bash
-node api/sync_openlibrary.js
-```
-
----
-
-## Cómo Ejecutar el Servidor
-
-Una vez que la configuración esté completa y la base de datos poblada, puedes iniciar el servidor de la API.
-
-```bash
-npm start
-```
-
-Si todo ha ido bien, verás un mensaje en la consola indicando que el servidor está corriendo en `http://localhost:3000`.
-
----
-
-## Endpoints de la API
-
-A continuación se listan los principales endpoints disponibles.
-
-### Endpoints Públicos
-
-| Método | Ruta                      | Descripción                                                              |
-| :----- | :------------------------ | :----------------------------------------------------------------------- |
-| `GET`  | `/api/books`              | Obtiene una lista de libros. Acepta query params para paginación y filtros (`page`, `limit`, `search`, `genre`, `year`). |
-| `GET`  | `/api/books/:id`          | Obtiene la información detallada de un libro específico y aumenta su contador de vistas. |
-| `GET`  | `/api/genres`             | Devuelve una lista de todos los géneros que tienen libros asociados.      |
-| `GET`  | `/api/stats`              | Proporciona estadísticas generales de la plataforma (total de libros, usuarios, libros populares, etc.). |
-
-### Endpoints de Autenticación
-
-_**Nota**: La implementación de estos endpoints no fue encontrada en los archivos analizados, pero el servidor espera que existan._
-
-| Método | Ruta                 | Descripción                  |
-| :----- | :------------------- | :--------------------------- |
-| `POST` | `/api/auth/register` | Para registrar un nuevo usuario. |
-| `POST` | `/api/auth/login`    | Para iniciar sesión y obtener un token JWT. |
-
-### Endpoints Protegidos (Requieren Token JWT)
-
-Para acceder a estos endpoints, se debe incluir el token en la cabecera de la petición: `Authorization: Bearer <tu_token_jwt>`.
-
-| Método | Ruta                         | Descripción                                      |
-| :----- | :--------------------------- | :----------------------------------------------- |
-| `POST` | `/api/books/:id/like`        | Da "like" o quita el "like" a un libro.          |
-| `POST` | `/api/books/:id/favorite`    | Agrega o quita un libro de la lista de favoritos del usuario. |
-| `GET`  | `/api/user/favorites`        | Obtiene la lista de libros favoritos del usuario autenticado. |
-| `GET`  | `/api/user/profile`          | Obtiene la información del perfil del usuario autenticado, incluyendo sus estadísticas. |
+-   **🔄 Pipeline de CI/CD**:
+    -   Configurar un flujo de trabajo de Integración Continua y Despliegue Continuo para automatizar las pruebas y los despliegues.
+    -   *Plataformas sugeridas: GitHub Actions, GitLab CI.*
