@@ -29,15 +29,17 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendPath = path.join(__dirname, '../../frontend');
 
 app.use(cors());
 app.use(express.json());
 
 // Configure static files - MUST come before routes
-app.use('/frontend', express.static('frontend'));
-app.use('/assets', express.static('frontend/assets'));
-app.use('/styles', express.static('frontend/styles'));
-app.use(express.static('frontend'));
+app.use('/frontend', express.static(frontendPath));
+app.use('/assets', express.static(path.join(frontendPath, 'assets')));
+app.use('/styles', express.static(path.join(frontendPath, 'styles')));
+app.use(express.static(frontendPath));
 
 // ============================================================================
 // API ROUTES
@@ -52,51 +54,51 @@ app.use('/api', apiRoutes);
 
 // Main route - redirect based on authentication
 app.get('/', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/index.html'));
+    res.sendFile(path.join(frontendPath, 'views/index.html'));
 });
 
 // Login page
 app.get('/login', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/login.html'));
+    res.sendFile(path.join(frontendPath, 'views/login.html'));
 });
 
 // Register page
 app.get('/register', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/register.html'));
+    res.sendFile(path.join(frontendPath, 'views/register.html'));
 });
 
 // Protected routes - Teacher Dashboard
 app.get('/teacher-dashboard', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-dashboard.html'));
+    res.sendFile(path.join(frontendPath, 'views/teacher-dashboard.html'));
 });
 
 app.get('/teacher-catalog', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-catalog.html'));
+    res.sendFile(path.join(frontendPath, 'views/teacher-catalog.html'));
 });
 
 app.get('/teacher-favs', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-favs.html'));
+    res.sendFile(path.join(frontendPath, 'views/teacher-favs.html'));
 });
 
 app.get('/teacher-mystudents', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/teacher-mystudents.html'));
+    res.sendFile(path.join(frontendPath, 'views/teacher-mystudents.html'));
 });
 
 // Protected routes - Student Dashboard
 app.get('/student-dashboard', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-dashboard.html'));
+    res.sendFile(path.join(frontendPath, 'views/student-dashboard.html'));
 });
 
 app.get('/student-catalog', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-catalog.html'));
+    res.sendFile(path.join(frontendPath, 'views/student-catalog.html'));
 });
 
 app.get('/student-favs', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/student-favs.html'));
+    res.sendFile(path.join(frontendPath, 'views/student-favs.html'));
 });
 
 app.get('/students-mybooks', (req, res) => {
-    res.sendFile(path.resolve('frontend/views/students-mybooks.html'));
+    res.sendFile(path.join(frontendPath, 'views/students-mybooks.html'));
 });
 
 // ============================================================================
@@ -120,7 +122,7 @@ app.use('*', (req, res) => {
             message: `Archivo no encontrado: ${req.path}`
         });
     }
-    res.sendFile(path.resolve('frontend/views/index.html'));
+    res.sendFile(path.join(frontendPath, 'views/index.html'));
 });
 
 // Global error handler
@@ -137,24 +139,6 @@ app.use((error, req, res, next) => {
 // ============================================================================
 
 // Start the server and synchronization
-app.listen(PORT, async () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📁 Serving static files from: frontend/`);
-    console.log(`🔐 Protected routes configured by roles`);
-    console.log(`📚 API endpoints available at: /api/*`);
-    
-    // Check if the database is empty before synchronizing
-    try {
-        const [rows] = await pool.query("SELECT COUNT(*) as count FROM books");
-        if (rows[0].count === 0) {
-            console.log("📚 Database is empty. Starting synchronization...");
-            await sincronizarTodosLosGeneros();
-        } else {
-            console.log("✅ Database already has books. No synchronization needed.");
-        }
-    } catch (error) {
-        console.error("❌ Error checking database:", error.message);
-    }
-});
+// Server startup logic moved to server.js
 
 export default app;
