@@ -8,7 +8,8 @@ const config = {
     
     // Production environment (your deployed backend)
     production: {
-        apiBaseUrl: 'https://your-backend-domain.com/api', // TODO: Cambia esto por la URL real de tu backend desplegado
+        // En Render, el frontend y backend están en el mismo dominio, así que usamos la URL actual
+        apiBaseUrl: `${window.location.origin}/api`, 
         environment: 'production'
     }
 };
