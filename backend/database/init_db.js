@@ -7,11 +7,10 @@ import 'dotenv/config';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function initDB() {
+export async function initializeDatabase() {
     let config;
 
     if (process.env.DATABASE_URL) {
-        console.log("🔗 Usando DATABASE_URL");
         const dbUrl = new URL(process.env.DATABASE_URL);
         config = {
             host: dbUrl.hostname,
@@ -20,10 +19,9 @@ async function initDB() {
             database: dbUrl.pathname.slice(1),
             port: Number(dbUrl.port) || 3306,
             ssl: { rejectUnauthorized: false },
-            multipleStatements: true // Importante para ejecutar el script completo
+            multipleStatements: true
         };
     } else {
-        console.log("🔗 Usando variables de entorno individuales");
         config = {
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
@@ -38,12 +36,20 @@ async function initDB() {
     let connection;
     try {
         connection = await mysql.createConnection(config);
-        console.log("✅ Conectado a la base de datos");
+        
+        // 1. Check if tables already exist to avoid overwriting
+        const [rows] = await connection.query("SHOW TABLES LIKE 'users'");
+        if (rows.length > 0) {
+            console.log("✅ La base de datos ya está inicializada (tablas encontradas).");
+            return; 
+        }
+
+        console.log("🆕 Base de datos vacía detectada. Iniciando creación de tablas...");
         
         const scriptPath = path.join(__dirname, '../../docs/script.sql');
         let sql = fs.readFileSync(scriptPath, 'utf8');
 
-        // Limpiar el script para que funcione en Aiven/Render (eliminando creación de DB y delimitadores)
+        // Clean up script
         sql = sql.replace(/DROP DATABASE IF EXISTS openbook;/g, '')
                  .replace(/CREATE DATABASE openbook;/g, '')
                  .replace(/USE openbook;/g, '')
@@ -51,17 +57,13 @@ async function initDB() {
                  .replace(/DELIMITER ;/g, '')
                  .replace(/END\/\//g, 'END;');
 
-        console.log("🚀 Ejecutando script de creación de tablas...");
         await connection.query(sql);
-        console.log("✅ Tablas creadas exitosamente.");
-        
-        console.log("ℹ️ Nota: Los datos de prueba (libros) se sincronizarán cuando inicies el servidor.");
+        console.log("✅ Tablas y datos semilla creados exitosamente.");
 
     } catch (error) {
         console.error("❌ Error inicializando la base de datos:", error);
+        // Don't throw to allow server to try starting anyway
     } finally {
         if (connection) await connection.end();
     }
 }
-
-initDB();
