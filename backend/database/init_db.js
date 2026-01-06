@@ -37,30 +37,30 @@ export async function initializeDatabase() {
     try {
         connection = await mysql.createConnection(config);
         
-        // 1. Check if tables already exist to avoid overwriting
+        // 1. Check if tables already exist
         const [rows] = await connection.query("SHOW TABLES LIKE 'users'");
-        if (rows.length > 0) {
-            console.log("✅ La base de datos ya está inicializada (tablas encontradas).");
-            return; 
+        let tablasExisten = rows.length > 0;
+
+        if (tablasExisten) {
+            console.log("✅ La base de datos ya tiene tablas estructura.");
+        } else {
+            console.log("🆕 Base de datos nueva detectada. Iniciando creación de tablas...");
+            const scriptPath = path.join(__dirname, '../../docs/script.sql');
+            let sql = fs.readFileSync(scriptPath, 'utf8');
+
+            // Clean up script
+            sql = sql.replace(/DROP DATABASE IF EXISTS openbook;/g, '')
+                     .replace(/CREATE DATABASE openbook;/g, '')
+                     .replace(/USE openbook;/g, '')
+                     .replace(/DELIMITER \/\//g, '')
+                     .replace(/DELIMITER ;/g, '')
+                     .replace(/END\/\//g, 'END;')
+                     // Replace double quotes with single quotes for ENUM compatibility
+                     .replace(/"/g, "'");
+
+            await connection.query(sql);
+            console.log("✅ Tablas creadas exitosamente.");
         }
-
-        console.log("🆕 Base de datos vacía detectada. Iniciando creación de tablas...");
-        
-        const scriptPath = path.join(__dirname, '../../docs/script.sql');
-        let sql = fs.readFileSync(scriptPath, 'utf8');
-
-        // Clean up script
-        sql = sql.replace(/DROP DATABASE IF EXISTS openbook;/g, '')
-                 .replace(/CREATE DATABASE openbook;/g, '')
-                 .replace(/USE openbook;/g, '')
-                 .replace(/DELIMITER \/\//g, '')
-                 .replace(/DELIMITER ;/g, '')
-                 .replace(/END\/\//g, 'END;')
-                 // Replace double quotes with single quotes for ENUM compatibility
-                 .replace(/"/g, "'");
-
-        await connection.query(sql);
-        console.log("✅ Tablas creadas exitosamente.");
         
         // 2. Load test data (users) if table is empty
         const [userRows] = await connection.query("SELECT COUNT(*) as count FROM users");
