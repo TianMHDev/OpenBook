@@ -60,6 +60,26 @@ export async function initializeDatabase() {
                  .replace(/"/g, "'");
 
         await connection.query(sql);
+        console.log("✅ Tablas creadas exitosamente.");
+        
+        // 2. Load test data (users) if table is empty
+        const [userRows] = await connection.query("SELECT COUNT(*) as count FROM users");
+        if (userRows[0].count === 0) {
+             console.log("🌱 Insertando datos de prueba (usuarios)...");
+             const dataScriptPath = path.join(__dirname, '../../docs/data_users.sql');
+             let dataSql = fs.readFileSync(dataScriptPath, 'utf8');
+             
+             // Clean data script just in case
+             dataSql = dataSql.replace(/"/g, "'");
+
+             try {
+                await connection.query(dataSql);
+                console.log("✅ Datos de prueba insertados.");
+             } catch (dataError) {
+                console.warn("⚠️ Advertencia insertando datos de prueba:", dataError.message);
+                console.warn("ℹ️ Es posible que algunos datos (asignaciones de libros) fallen si los libros no se han sincronizado aún. Los usuarios deberían haberse creado.");
+             }
+        }
         console.log("✅ Tablas y datos semilla creados exitosamente.");
 
     } catch (error) {
