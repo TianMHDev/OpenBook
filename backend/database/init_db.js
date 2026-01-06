@@ -55,7 +55,9 @@ export async function initializeDatabase() {
                  .replace(/USE openbook;/g, '')
                  .replace(/DELIMITER \/\//g, '')
                  .replace(/DELIMITER ;/g, '')
-                 .replace(/END\/\//g, 'END;');
+                 .replace(/END\/\//g, 'END;')
+                 // Replace double quotes with single quotes for ENUM compatibility
+                 .replace(/"/g, "'");
 
         await connection.query(sql);
         console.log("✅ Tablas y datos semilla creados exitosamente.");
