@@ -8,15 +8,25 @@ dotenv.config(); // Loading Environment Variables from the .env File
 // Make sure the environment variables are defined in your .env file
 // and that the .env file is in the project root.
 
-export const pool = mysql.createPool({
+const dbConfig = {
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
-});
+};
+
+// Add SSL configuration if running in production or explicitly requested
+if (process.env.NODE_ENV === 'production' || process.env.DB_SSL === 'true') {
+  dbConfig.ssl = {
+    rejectUnauthorized: false
+  };
+}
+
+export const pool = mysql.createPool(process.env.DATABASE_URL || dbConfig);
 
 export const checkConnection = async () => {
   try {
