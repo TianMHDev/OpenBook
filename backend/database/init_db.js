@@ -37,42 +37,46 @@ export async function initializeDatabase() {
     try {
         connection = await mysql.createConnection(config);
         
-        // ⚠️ ALERTA: Forzando reinicio de base de datos para corregir estado (Borrar todo y empezar de nuevo)
-        console.log("♻️  RESETEANDO BASE DE DATOS COMPLETA (Solicitado)...");
-        
-        const scriptPath = path.join(__dirname, '../../docs/script.sql');
-        let sql = fs.readFileSync(scriptPath, 'utf8');
+        // 1. Check if tables already exist
+        const [rows] = await connection.query("SHOW TABLES LIKE 'users'");
+        let tablasExisten = rows.length > 0;
 
-        // Clean up script
-        sql = sql.replace(/DROP DATABASE IF EXISTS openbook;/g, '')
-                 .replace(/CREATE DATABASE openbook;/g, '')
-                 .replace(/USE openbook;/g, '')
-                 .replace(/DELIMITER \/\//g, '')
-                 .replace(/DELIMITER ;/g, '')
-                 .replace(/END\/\//g, 'END;')
-                 .replace(/"/g, "'");
+        if (tablasExisten) {
+            console.log("✅ La base de datos ya está inicializada. No se realizarán cambios estructurales.");
+        } else {
+            console.log("🆕 Base de datos nueva detectada. Iniciando creación de tablas...");
+            const scriptPath = path.join(__dirname, '../../docs/script.sql');
+            let sql = fs.readFileSync(scriptPath, 'utf8');
 
-        // Disable FK checks to allow dropping tables in any order
-        await connection.query("SET FOREIGN_KEY_CHECKS = 0");
-        await connection.query(sql);
-        await connection.query("SET FOREIGN_KEY_CHECKS = 1");
-        
-        console.log("✅ Tablas recreadas desde cero.");
-        
-        // 2. Always load test data now because we just wiped the DB
-        console.log("🌱 Insertando datos de prueba (usuarios)...");
-        const dataScriptPath = path.join(__dirname, '../../docs/data_users.sql');
-        let dataSql = fs.readFileSync(dataScriptPath, 'utf8');
-        
-        // Clean data script just in case
-        dataSql = dataSql.replace(/"/g, "'");
+            // Clean up script
+            sql = sql.replace(/DROP DATABASE IF EXISTS openbook;/g, '')
+                     .replace(/CREATE DATABASE openbook;/g, '')
+                     .replace(/USE openbook;/g, '')
+                     .replace(/DELIMITER \/\//g, '')
+                     .replace(/DELIMITER ;/g, '')
+                     .replace(/END\/\//g, 'END;')
+                     .replace(/"/g, "'");
 
-        try {
-           await connection.query(dataSql);
-           console.log("✅ Datos de prueba insertados exitosamente.");
-        } catch (dataError) {
-           console.warn("⚠️ Advertencia insertando datos de prueba:", dataError.message);
-           console.warn("ℹ️ Es posible que algunos datos (asignaciones de libros) fallen si los libros no se han sincronizado aún. Los usuarios deberían haberse creado.");
+            await connection.query(sql);
+            console.log("✅ Tablas creadas exitosamente.");
+        }
+        
+        // 2. Load test data (users) ONLY if table is empty
+        if (userRows[0].count === 0) {
+             console.log("🌱 Insertando datos de prueba (usuarios)...");
+             const dataScriptPath = path.join(__dirname, '../../docs/data_users.sql');
+             let dataSql = fs.readFileSync(dataScriptPath, 'utf8');
+             
+             // Clean data script just in case
+             dataSql = dataSql.replace(/"/g, "'");
+
+             try {
+                await connection.query(dataSql);
+                console.log("✅ Datos de prueba insertados exitosamente.");
+             } catch (dataError) {
+                console.warn("⚠️ Advertencia insertando datos de prueba:", dataError.message);
+                console.warn("ℹ️ Es posible que algunos datos (asignaciones de libros) fallen si los libros no se han sincronizado aún. Los usuarios deberían haberse creado.");
+             }
         }
         console.log("✅ Tablas y datos semilla creados exitosamente.");
 

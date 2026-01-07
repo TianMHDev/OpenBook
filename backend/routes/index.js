@@ -13,6 +13,5 @@ router.use('/auth', authRoutes);
 router.use('/teacher', teacherRoutes);
 router.use('/books', bookRoutes);
 router.use('/users', userRoutes);
-router.use('/debug', resetRoutes);
 
 export default router;
